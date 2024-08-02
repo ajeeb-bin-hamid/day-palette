@@ -16,13 +16,26 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testApplicationId "com.day.palette"
+        testInstrumentationRunner "com.day.palette.CucumberJunitRunner"
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions = ['env']
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix ".dev"
+        }
+
+        prod {
+            dimension "env"
         }
     }
     compileOptions {
@@ -37,6 +50,7 @@ android {
         buildConfig = true
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -94,6 +108,7 @@ dependencies {
     //Orbit for state handling
     implementation libs.orbit.core
     implementation libs.orbit.viewmodel
+
 }
 
 // Allow references to generated code
