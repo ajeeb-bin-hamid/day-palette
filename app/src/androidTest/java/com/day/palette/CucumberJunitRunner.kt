@@ -7,6 +7,16 @@ import io.cucumber.junit.CucumberOptions
 import org.junit.runner.RunWith
 import java.io.File
 
+/**When running BDD tests in an automated pipeline, it's crucial to store the resulting test reports.
+ * These reports are generated in the app's data directory within the Android folder.
+ * The reports, available in both XML and HTML formats,
+ * can be retrieved from this location and stored in a more permanent and accessible location after the tests have completed.
+ * This ensures that the results are preserved and can be reviewed or analyzed as needed.
+ *
+ * Example reports location if we are running BDD tests in the 'dev' environment:
+ * /storage/emulated/0/Android/data/com.day.palette.dev/files/reports/cucumber.html
+ * /storage/emulated/0/Android/data/com.day.palette.dev/files/reports/cucumber.xml*/
+
 @RunWith(Cucumber::class)
 @CucumberOptions
 class CucumberJunitRunner : CucumberAndroidJUnitRunner() {
@@ -14,10 +24,8 @@ class CucumberJunitRunner : CucumberAndroidJUnitRunner() {
         bundle.putString(
             "plugin", pluginConfigurationString
         )
-        // we programmatically create the plugin configuration
-        //it crashes on Android R without it
-        File(absoluteFilesPath).mkdirs()
 
+        File(absoluteFilesPath).mkdirs()
         super.onCreate(bundle)
     }
 

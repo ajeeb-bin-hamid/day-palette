@@ -12,6 +12,8 @@ class CucumberScenarioHolder {
 
     private var scenario: ActivityScenario<*>? = null
 
+    /**This function will execute before each scenario,
+     * allowing for any initial setup, including granting necessary app permissions.*/
     @Before
     fun setUp() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -24,6 +26,7 @@ class CucumberScenarioHolder {
 
     }
 
+    /**This function will be executed after each scenario, during which we will close the Scenario Holder.*/
     @After
     fun tearDown() {
         scenario?.close()
