@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -47,4 +49,50 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
+
+    //Dagger Hilt for dependency injection
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+
+    // Lifecycle
+    implementation libs.androidx.lifecycle.viewmodel.ktx
+
+    // Coroutines
+    implementation libs.kotlinx.coroutines.core
+    implementation libs.kotlinx.coroutines.android
+
+    //Retrofit
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.gson
+
+    //SDP library for uniform size of layout resources in all type of screens
+    implementation libs.sdp.android
+
+    //Camera support
+    implementation libs.androidx.camera.camera2
+    implementation libs.androidx.camera.view
+    implementation libs.androidx.camera.lifecycle
+
+    //Glide
+    implementation libs.glide
+
+    //Faker
+    implementation libs.datafaker
+
+    //Cucumber for BDD
+    androidTestImplementation(libs.cucumber.android)
+    androidTestImplementation(libs.cucumber.picocontainer)
+    implementation libs.poi.ooxml
+    implementation(libs.xmlbeans)
+    androidTestImplementation libs.stax.api
+    androidTestImplementation libs.aalto.xml
+
+    //Picker Actions for Espresso
+    androidTestImplementation libs.espresso.contrib
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes true
 }
