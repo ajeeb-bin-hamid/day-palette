@@ -5,8 +5,15 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
+import com.day.palette.R
 import com.day.palette.databinding.ActivityMainBinding
+import com.day.palette.presentation.ui.main.explore.ExploreFragment
+import com.day.palette.presentation.ui.main.home.HomeFragment
+import com.day.palette.presentation.ui.main.memories.MemoriesFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.viewmodel.observe
@@ -24,8 +31,16 @@ class MainActivity : AppCompatActivity() {
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        ViewCompat.setOnApplyWindowInsetsListener(b.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
+        }
+
         vm.observe(this, state = ::observeState)
         observeIntent()
+
+        setUpBottomBar()
 
     }
 
@@ -42,6 +57,7 @@ class MainActivity : AppCompatActivity() {
                     is MainIntent.ShowToast -> {
                         Toast.makeText(this@MainActivity, intent.message, Toast.LENGTH_SHORT).show()
                     }
+
                     else -> {
                         //
                     }
@@ -50,4 +66,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**Set up the bottom navigation bar with swipe-to-change-tab functionality,
+     * ensuring both the BottomNavigationView and ViewPager2 are synchronized.*/
+    private fun setUpBottomBar() {
+
+        /**By default, BottomNavigationView doesn't support swiping between tabs.
+         * To enable this behavior, implement a callback on ViewPager2.*/
+        b.mainActivityPager.apply {
+            currentItem = 0
+            adapter = MainViewPagerAdapter(this@MainActivity).apply {
+                addFragment(HomeFragment())
+                addFragment(ExploreFragment())
+                addFragment(MemoriesFragment())
+            }
+
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    when (position) {
+                        0 -> b.mainActivityBottomBar.selectedItemId = R.id.bottom_bar_home
+                        1 -> b.mainActivityBottomBar.selectedItemId = R.id.bottom_bar_explore
+                        2 -> b.mainActivityBottomBar.selectedItemId = R.id.bottom_bar_memories
+                        else -> b.mainActivityBottomBar.selectedItemId = R.id.bottom_bar_home
+                    }
+                    super.onPageSelected(position)
+                }
+            })
+        }
+
+        /**Set up a listener to update the ViewPager indices when the user switches tabs using the bottom navigation bar.*/
+        b.mainActivityBottomBar.apply {
+            setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.bottom_bar_home -> b.mainActivityPager.currentItem = 0
+                    R.id.bottom_bar_explore -> b.mainActivityPager.currentItem = 1
+                    R.id.bottom_bar_memories -> b.mainActivityPager.currentItem = 2
+                }
+                true
+            }
+        }
+    }
 }

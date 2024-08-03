@@ -14,7 +14,7 @@ class HomeSteps {
 
     @Given("I am on the home screen")
     fun iAmInHomeScreen() {
-        Espresso.onView(withId(R.id.main)).check(
+        Espresso.onView(withId(R.id.mainActivity)).check(
             matches(
                 isDisplayed()
             )
