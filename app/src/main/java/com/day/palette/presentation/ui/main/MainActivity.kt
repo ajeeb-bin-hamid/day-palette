@@ -27,10 +27,6 @@ class MainActivity : AppCompatActivity() {
         vm.observe(this, state = ::observeState)
         observeIntent()
 
-        b.mainActivityTV.setOnClickListener {
-            vm.vmActions(MainIntent.FetchData)
-        }
-
     }
 
     /**Observe changes in the State using Orbit StateFlow*/

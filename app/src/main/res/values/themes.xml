@@ -1,9 +1,29 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.DayPalette" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/buttercup_bliss</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="colorOnBackground">@color/coal</item>
+        <item name="dividerColor">@color/pearl</item>
     </style>
 
     <style name="Theme.DayPalette" parent="Base.Theme.DayPalette" />
+
+    <!--    Custom styles-->
+
+    <style name="App.Bar.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/buttercup_bliss</item>
+    </style>
+
+    <style name="Text.Bar.Active" parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/poppins_bold</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Text.Bar.InActive" parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

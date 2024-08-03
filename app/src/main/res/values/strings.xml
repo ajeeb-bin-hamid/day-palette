@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Day Palette</string>
+    <string name="future_holidays_in">Future holidays in</string>
+    <string name="home">Home</string>
+    <string name="explore">Explore</string>
+    <string name="memories">Memories</string>
 </resources>
