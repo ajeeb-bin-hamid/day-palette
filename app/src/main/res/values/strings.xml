@@ -5,7 +5,4 @@
     <string name="explore">Explore</string>
     <string name="memories">Memories</string>
 
-    <!--    Default values-->
-    <string name="default_country_name">United States</string>
-    <string name="default_country_code">US</string>
 </resources>

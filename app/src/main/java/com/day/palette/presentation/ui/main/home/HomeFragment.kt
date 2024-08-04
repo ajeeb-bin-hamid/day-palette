@@ -14,6 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.presentation.utils.TypefaceSpan
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.viewmodel.observe
@@ -33,12 +35,19 @@ class HomeFragment : Fragment() {
         vm.observe(this, state = ::observeState)
         observeIntent()
 
+        vm.vmActions(HomeIntent.GetCountryHolidays)
+
+        b.homeFragmentTitleTV.setOnClickListener {
+            vm.vmActions(HomeIntent.GetCountryHolidays)
+        }
+
         return b.root
     }
 
     /**Observe changes in the State using Orbit StateFlow*/
     private fun observeState(state: HomeState) {
         setUpTitle(state.selectedCountryName)
+        println("infox, ${Gson().toJson(state.countryHolidays)}")
     }
 
     /**Observe for new intents using SharedFlow*/
@@ -46,6 +55,9 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             vm.uiActions.collect { intent ->
                 when (intent) {
+                    is HomeIntent.ShowSnack -> {
+                        Snackbar.make(b.root, intent.message, Snackbar.LENGTH_SHORT).show()
+                    }
 
                     else -> {
                         //
@@ -55,9 +67,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setUpTitle(selectedCountryName: String?) {
-        val countryName = selectedCountryName ?: getString(R.string.default_country_name)
-
+    private fun setUpTitle(selectedCountryName: String) {
         val boldFont: Typeface? = ResourcesCompat.getFont(requireContext(), R.font.poppins_bold)
 
         // Create a SpannableString
@@ -67,7 +77,10 @@ class HomeFragment : Fragment() {
         boldFont?.let {
             val customTypefaceSpan = TypefaceSpan("", it)
             spannableString.setSpan(
-                customTypefaceSpan, 19, 19 + countryName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                customTypefaceSpan,
+                19,
+                19 + selectedCountryName.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
         // Set the SpannableString to the TextView
