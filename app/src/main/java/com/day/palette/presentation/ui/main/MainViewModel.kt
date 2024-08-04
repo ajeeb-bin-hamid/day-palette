@@ -31,6 +31,6 @@ class MainViewModel @Inject constructor() : ViewModel(), ContainerHost<MainState
     private fun dos() = intent {
         reduce { state.copy(isLoading = true) }
     }
-    
+
 
 }

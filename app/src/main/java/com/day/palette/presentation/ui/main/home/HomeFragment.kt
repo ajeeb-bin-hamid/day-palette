@@ -11,8 +11,10 @@ import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
+import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.utils.TypefaceSpan
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +34,8 @@ class HomeFragment : Fragment() {
 
         vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
 
+        setUpRecyclerView()
+
         vm.invoke(HomeIntent.GetCountryHolidays)
 
         b.homeFragmentTitleTV.setOnClickListener {
@@ -41,11 +45,11 @@ class HomeFragment : Fragment() {
         return b.root
     }
 
+
     /**Observe changes in the State using Orbit StateFlow*/
     private fun observeState(state: HomeState) {
-        setUpTitle(state.selectedCountryName)
-
-
+        modifyTitle(state.selectedCountryName)
+        modifyRecyclerView(state.countryHolidays)
     }
 
     /**Observe side effects using Orbit StateFlow*/
@@ -65,7 +69,27 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setUpTitle(selectedCountryName: String) {
+    private fun setUpRecyclerView() {
+        b.homeFragmentRV.layoutManager = GridLayoutManager(requireContext(), 2)
+        b.homeFragmentRV.isNestedScrollingEnabled = false
+
+        val adapter = HomeRecyclerAdapter(requireContext(), ArrayList())
+        adapter.setOnClickListener(object : HomeRecyclerAdapter.OnClickListener {
+            override fun onClick(position: Int, holiday: Holiday, view: View) {
+                //
+            }
+
+        })
+        b.homeFragmentRV.adapter = adapter/* b.homeFragmentRV.addItemDecoration(
+             SearchUsersDecoration(
+                 requireContext().toPx(
+                     16
+                 )
+             )
+         )*/
+    }
+
+    private fun modifyTitle(selectedCountryName: String) {
         val boldFont: Typeface? = ResourcesCompat.getFont(requireContext(), R.font.poppins_bold)
 
         // Create a SpannableString
@@ -85,6 +109,14 @@ class HomeFragment : Fragment() {
         // Set the SpannableString to the TextView
         b.homeFragmentTitleTV.text = spannableString
 
+    }
+
+    private fun modifyRecyclerView(countryHolidays: List<Holiday>) {
+        b.homeFragmentRV.adapter?.let {
+            if (it is HomeRecyclerAdapter && countryHolidays.size > it.itemCount) it.appendItems(
+                countryHolidays
+            )
+        }
     }
 
 }
