@@ -1,5 +1,6 @@
 package com.day.palette.data.di
 
+import com.day.palette.BuildConfig
 import com.day.palette.data.network.ApiService
 import com.day.palette.data.prefs.SharedPrefsHelper
 import com.day.palette.data.repository.RemoteRepositoryImpl
@@ -21,7 +22,7 @@ class DataModule {
     @Provides
     @Singleton
     fun provideApiService(): ApiService {
-        return Retrofit.Builder().baseUrl("https://date.nager.at/api/v3/")
+        return Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create()).build()
             .create(ApiService::class.java)
     }

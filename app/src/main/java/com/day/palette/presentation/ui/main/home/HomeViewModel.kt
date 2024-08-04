@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getSelectedCountryDetailsUseCase: GetSelectedCountryDetailsUseCase,
+    getSelectedCountryDetailsUseCase: GetSelectedCountryDetailsUseCase,
     private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase
 ) : ViewModel(), ContainerHost<HomeState, Nothing> {
 

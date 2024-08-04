@@ -32,10 +32,12 @@ android {
         dev {
             dimension "env"
             applicationIdSuffix ".dev"
+            buildConfigField("String", "BASE_URL", "\"${env.BASE_URL.value}\"")
         }
 
         prod {
             dimension "env"
+            buildConfigField("String", "BASE_URL", "\"${env.BASE_URL.value}\"")
         }
     }
     compileOptions {
