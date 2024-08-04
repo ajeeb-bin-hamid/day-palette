@@ -13,21 +13,36 @@
         style="@style/Text.1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/future_holidays_in"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toStartOf="@+id/homeFragmentChangeCountryButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Future holidays in United States" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/homeFragmentChangeCountryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:background="@drawable/bg_outline_icon"
+        android:layout_marginTop="28dp"
         android:padding="12dp"
         android:src="@drawable/ico_arrow_down"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/homeFragmentRV"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homeFragmentTitleTV"
+        app:spanCount="2"
+        tools:itemCount="5"
+        tools:listitem="@layout/card_holiday_mini" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

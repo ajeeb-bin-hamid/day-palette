@@ -3,6 +3,8 @@
     <style name="Base.Theme.DayPalette" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/buttercup_bliss</item>
+        <item name="colorOnPrimary">@color/coal</item>
+        <item name="colorOnSecondary">@color/white</item>
         <item name="android:colorBackground">@color/white</item>
         <item name="colorOnBackground">@color/coal</item>
         <item name="dividerColor">@color/pearl</item>

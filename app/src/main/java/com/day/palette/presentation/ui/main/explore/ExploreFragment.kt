@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.day.palette.databinding.FragmentExploreBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class ExploreFragment : Fragment() {
 
     private lateinit var b: FragmentExploreBinding
