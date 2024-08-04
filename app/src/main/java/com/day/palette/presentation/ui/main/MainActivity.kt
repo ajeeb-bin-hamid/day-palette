@@ -7,15 +7,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.day.palette.R
 import com.day.palette.databinding.ActivityMainBinding
 import com.day.palette.presentation.ui.main.explore.ExploreFragment
 import com.day.palette.presentation.ui.main.home.HomeFragment
 import com.day.palette.presentation.ui.main.memories.MemoriesFragment
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.viewmodel.observe
 
 @AndroidEntryPoint
@@ -37,8 +36,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        vm.observe(this, state = ::observeState)
-        observeIntent()
+        vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
 
         setUpBottomBar()
 
@@ -49,19 +47,19 @@ class MainActivity : AppCompatActivity() {
         println("infox, ${state.isLoading}")
     }
 
-    /**Observe for new intents using SharedFlow*/
-    private fun observeIntent() {
-        lifecycleScope.launch {
-            vm.uiActions.collect { intent ->
-                when (intent) {
-                    is MainIntent.ShowToast -> {
-                        Toast.makeText(this@MainActivity, intent.message, Toast.LENGTH_SHORT).show()
-                    }
+    /**Observe side effects using Orbit StateFlow*/
+    private fun observeIntent(intent: MainIntent) {
+        when (intent) {
+            is MainIntent.ShowToast -> {
+                Toast.makeText(this@MainActivity, intent.message, Toast.LENGTH_SHORT).show()
+            }
 
-                    else -> {
-                        //
-                    }
-                }
+            is MainIntent.ShowSnack -> {
+                Snackbar.make(b.root, intent.message, Snackbar.LENGTH_SHORT).show()
+            }
+
+            else -> {
+                //
             }
         }
     }

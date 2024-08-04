@@ -7,17 +7,15 @@ import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.presentation.utils.TypefaceSpan
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.viewmodel.observe
 
 
@@ -32,13 +30,12 @@ class HomeFragment : Fragment() {
     ): View {
         b = FragmentHomeBinding.inflate(inflater, container, false)
 
-        vm.observe(this, state = ::observeState)
-        observeIntent()
+        vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
 
-        vm.vmActions(HomeIntent.GetCountryHolidays)
+        vm.invoke(HomeIntent.GetCountryHolidays)
 
         b.homeFragmentTitleTV.setOnClickListener {
-            vm.vmActions(HomeIntent.GetCountryHolidays)
+            vm.invoke(HomeIntent.GetCountryHolidays)
         }
 
         return b.root
@@ -47,22 +44,23 @@ class HomeFragment : Fragment() {
     /**Observe changes in the State using Orbit StateFlow*/
     private fun observeState(state: HomeState) {
         setUpTitle(state.selectedCountryName)
-        println("infox, ${Gson().toJson(state.countryHolidays)}")
+
+
     }
 
-    /**Observe for new intents using SharedFlow*/
-    private fun observeIntent() {
-        lifecycleScope.launch {
-            vm.uiActions.collect { intent ->
-                when (intent) {
-                    is HomeIntent.ShowSnack -> {
-                        Snackbar.make(b.root, intent.message, Snackbar.LENGTH_SHORT).show()
-                    }
+    /**Observe side effects using Orbit StateFlow*/
+    private fun observeIntent(intent: HomeIntent) {
+        when (intent) {
+            is HomeIntent.ShowToast -> {
+                Toast.makeText(requireContext(), intent.message, Toast.LENGTH_SHORT).show()
+            }
 
-                    else -> {
-                        //
-                    }
-                }
+            is HomeIntent.ShowSnack -> {
+                Snackbar.make(b.root, intent.message, Snackbar.LENGTH_SHORT).show()
+            }
+
+            else -> {
+                //
             }
         }
     }
@@ -71,15 +69,16 @@ class HomeFragment : Fragment() {
         val boldFont: Typeface? = ResourcesCompat.getFont(requireContext(), R.font.poppins_bold)
 
         // Create a SpannableString
-        val spannableString = SpannableString("Future holidays in United States")
+        val prefixString = getString(R.string.future_holidays_in)
+        val spannableString = SpannableString("$prefixString $selectedCountryName")
 
         // Apply bold font to a specific portion
         boldFont?.let {
             val customTypefaceSpan = TypefaceSpan("", it)
             spannableString.setSpan(
                 customTypefaceSpan,
-                19,
-                19 + selectedCountryName.length,
+                prefixString.length,
+                prefixString.length + selectedCountryName.length + 1,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
