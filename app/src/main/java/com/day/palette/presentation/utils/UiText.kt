@@ -1,4 +1,4 @@
-package com.day.palette.presentation
+package com.day.palette.presentation.utils
 
 import android.content.Context
 import androidx.annotation.StringRes

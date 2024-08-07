@@ -1,6 +1,6 @@
 package com.day.palette.presentation.ui.main.home
 
-import com.day.palette.presentation.UiText
+import com.day.palette.presentation.utils.UiText
 
 sealed class HomeIntent {
     /**Actions that can be invoked on the ViewModel*/

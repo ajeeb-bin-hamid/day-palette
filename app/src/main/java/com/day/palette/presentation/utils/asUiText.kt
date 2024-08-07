@@ -1,4 +1,4 @@
-package com.day.palette.presentation
+package com.day.palette.presentation.utils
 
 import com.day.palette.R
 import com.day.palette.domain.Errors

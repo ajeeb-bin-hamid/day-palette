@@ -16,6 +16,7 @@ import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.utils.TypefaceSpan
+import com.day.palette.presentation.utils.toPx
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.orbitmvi.orbit.viewmodel.observe
@@ -30,17 +31,13 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        b = FragmentHomeBinding.inflate(inflater, container, false)
 
+        b = FragmentHomeBinding.inflate(inflater, container, false)
         vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
-        // observeIntent()
 
         setUpRecyclerView()
 
-
-        b.homeFragmentTitleTV.setOnClickListener {
-            vm.invoke(HomeIntent.GetCountryHolidays)
-        }
+        vm.invoke(HomeIntent.GetCountryHolidays)
 
         return b.root
     }
@@ -75,44 +72,44 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUpRecyclerView() {
-        b.homeFragmentRV.layoutManager = GridLayoutManager(requireContext(), 2)
-        b.homeFragmentRV.isNestedScrollingEnabled = false
+        b.homeFragmentRV.apply {
+            layoutManager = GridLayoutManager(requireContext(), 2)
+            isNestedScrollingEnabled = false
+            addItemDecoration(HomeRecyclerDecoration(requireContext().toPx(16)))
 
-        val adapter = HomeRecyclerAdapter(requireContext(), ArrayList())
-        adapter.setOnClickListener(object : HomeRecyclerAdapter.OnClickListener {
-            override fun onClick(position: Int, holiday: Holiday, view: View) {
-                //
+            adapter = HomeRecyclerAdapter(requireContext(), ArrayList()).apply {
+                setOnClickListener(object : HomeRecyclerAdapter.OnClickListener {
+                    override fun onClick(position: Int, holiday: Holiday, view: View) {
+                        //
+                    }
+
+                })
             }
+        }
 
-        })
-        b.homeFragmentRV.adapter = adapter/* b.homeFragmentRV.addItemDecoration(
-             SearchUsersDecoration(
-                 requireContext().toPx(
-                     16
-                 )
-             )
-         )*/
     }
 
     private fun modifyTitle(selectedCountryName: String) {
-        val boldFont: Typeface? = ResourcesCompat.getFont(requireContext(), R.font.poppins_bold)
+        context?.let { cxt ->
+            val boldFont: Typeface? = ResourcesCompat.getFont(cxt, R.font.poppins_bold)
 
-        // Create a SpannableString
-        val prefixString = getString(R.string.future_holidays_in)
-        val spannableString = SpannableString("$prefixString $selectedCountryName")
+            // Create a SpannableString
+            val prefixString = getString(R.string.future_holidays_in)
+            val spannableString = SpannableString("$prefixString $selectedCountryName")
 
-        // Apply bold font to a specific portion
-        boldFont?.let {
-            val customTypefaceSpan = TypefaceSpan("", it)
-            spannableString.setSpan(
-                customTypefaceSpan,
-                prefixString.length,
-                prefixString.length + selectedCountryName.length + 1,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+            // Apply bold font to a specific portion
+            boldFont?.let {
+                val customTypefaceSpan = TypefaceSpan("", it)
+                spannableString.setSpan(
+                    customTypefaceSpan,
+                    prefixString.length,
+                    prefixString.length + selectedCountryName.length + 1,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            // Set the SpannableString to the TextView
+            b.homeFragmentTitleTV.text = spannableString
         }
-        // Set the SpannableString to the TextView
-        b.homeFragmentTitleTV.text = spannableString
 
     }
 

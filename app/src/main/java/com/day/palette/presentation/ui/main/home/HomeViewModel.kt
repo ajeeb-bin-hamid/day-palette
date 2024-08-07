@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.day.palette.domain.GenericResult
 import com.day.palette.domain.usecase.GetCountryHolidaysUseCase
 import com.day.palette.domain.usecase.GetSelectedCountryDetailsUseCase
-import com.day.palette.presentation.asUiText
+import com.day.palette.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
