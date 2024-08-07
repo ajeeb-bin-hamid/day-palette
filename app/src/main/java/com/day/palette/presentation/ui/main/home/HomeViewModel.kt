@@ -2,9 +2,10 @@ package com.day.palette.presentation.ui.main.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.day.palette.GenericResult
+import com.day.palette.domain.GenericResult
 import com.day.palette.domain.usecase.GetCountryHolidaysUseCase
 import com.day.palette.domain.usecase.GetSelectedCountryDetailsUseCase
+import com.day.palette.presentation.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
@@ -24,18 +25,41 @@ class HomeViewModel @Inject constructor(
     private val selectedCountryDetails = getSelectedCountryDetailsUseCase.execute()
 
     private val initialState = HomeState(
-        selectedCountryName = selectedCountryDetails.selectedCountryName,
-        selectedCountryCode = selectedCountryDetails.selectedCountryCode,
+        selectedCountryName = DEFAULT_COUNTRY_NAME,
+        selectedCountryCode = DEFAULT_COUNTRY_CODE,
         countryHolidays = emptyList(),
         isLoading = false
     )
 
     override val container: Container<HomeState, HomeIntent> = container(initialState)
 
+    /**This block evaluates the shared preference use case call.
+     * If the call is successful, the state is updated with the retrieved data.*/
+    init {
+        when (selectedCountryDetails) {
+            is GenericResult.Success -> {
+                intent {
+                    reduce {
+                        state.copy(
+                            selectedCountryName = selectedCountryDetails.data.selectedCountryName,
+                            selectedCountryCode = selectedCountryDetails.data.selectedCountryCode
+                        )
+                    }
+                }
+            }
+
+            is GenericResult.Error -> {
+                //
+            }
+        }
+    }
+
+    /**Public function exposed to UI components such as Activities and Fragments,
+     * allowing them to invoke operations on this ViewModel.*/
     fun invoke(action: HomeIntent) = intent {
         when (action) {
             HomeIntent.GetCountryHolidays -> {
-                getCountryHolidays(selectedCountryDetails.selectedCountryCode)
+                getCountryHolidays(state.selectedCountryCode)
             }
 
             else -> {
@@ -48,14 +72,19 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             when (val countryHolidays = getCountryHolidaysUseCase.execute(countryCode)) {
                 is GenericResult.Success -> {
-                    countryHolidays.data?.let { intent { reduce { state.copy(countryHolidays = it) } } }
+                    intent { reduce { state.copy(countryHolidays = countryHolidays.data) } }
                 }
 
                 is GenericResult.Error -> {
-                    countryHolidays.e.message?.let { intent { postSideEffect(HomeIntent.ShowSnack(it)) } }
+                    intent { postSideEffect(HomeIntent.ShowSnack(countryHolidays.error.asUiText())) }
                 }
             }
 
         }
+    }
+
+    companion object {
+        const val DEFAULT_COUNTRY_NAME = "United States"
+        const val DEFAULT_COUNTRY_CODE = "US"
     }
 }

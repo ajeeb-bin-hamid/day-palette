@@ -1,6 +1,8 @@
 package com.day.palette.data.repository
 
 import com.day.palette.data.prefs.SharedPrefsHelper
+import com.day.palette.domain.Errors
+import com.day.palette.domain.GenericResult
 import com.day.palette.domain.model.SelectedCountryDetails
 import com.day.palette.domain.repository.UserPrefsRepository
 import javax.inject.Inject
@@ -8,9 +10,13 @@ import javax.inject.Inject
 class UserPrefsRepositoryImpl @Inject constructor(private val sharedPrefsHelper: SharedPrefsHelper) :
     UserPrefsRepository {
 
-    override fun getSelectedCountryDetails(): SelectedCountryDetails {
+    override fun getSelectedCountryDetails(): GenericResult<SelectedCountryDetails, Errors.Prefs> {
         val countryName = sharedPrefsHelper.selectedCountryName
         val countryCode = sharedPrefsHelper.selectedCountryCode
-        return SelectedCountryDetails(countryName, countryCode)
+
+        if (countryName != null && countryCode != null) return GenericResult.Success(
+            SelectedCountryDetails(countryName, countryCode)
+        )
+        return GenericResult.Error(Errors.Prefs.NO_SUCH_DATA)
     }
 }

@@ -7,6 +7,6 @@ import retrofit2.http.Path
 
 interface ApiService {
 
-    @GET("NextPublicHolidays/{code}")
+    @GET("NextPublicHolidayss/{code}")
     suspend fun getCountryHolidays(@Path("code") countryCode: String): Response<List<Holiday>>
 }

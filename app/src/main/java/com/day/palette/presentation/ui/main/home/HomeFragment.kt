@@ -33,10 +33,10 @@ class HomeFragment : Fragment() {
         b = FragmentHomeBinding.inflate(inflater, container, false)
 
         vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
+        // observeIntent()
 
         setUpRecyclerView()
 
-        vm.invoke(HomeIntent.GetCountryHolidays)
 
         b.homeFragmentTitleTV.setOnClickListener {
             vm.invoke(HomeIntent.GetCountryHolidays)
@@ -56,11 +56,16 @@ class HomeFragment : Fragment() {
     private fun observeIntent(intent: HomeIntent) {
         when (intent) {
             is HomeIntent.ShowToast -> {
-                Toast.makeText(requireContext(), intent.message, Toast.LENGTH_SHORT).show()
+                context?.let {
+                    Toast.makeText(it, intent.message.asString(it), Toast.LENGTH_SHORT).show()
+                }
+
             }
 
             is HomeIntent.ShowSnack -> {
-                Snackbar.make(b.root, intent.message, Snackbar.LENGTH_SHORT).show()
+                context?.let {
+                    Snackbar.make(b.root, intent.message.asString(it), Snackbar.LENGTH_SHORT).show()
+                }
             }
 
             else -> {
