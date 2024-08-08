@@ -8,6 +8,7 @@
         <item name="android:colorBackground">@color/white</item>
         <item name="colorOnBackground">@color/coal</item>
         <item name="dividerColor">@color/pearl</item>
+        <item name="shimmerColor">@color/blush</item>
     </style>
 
     <style name="Theme.DayPalette" parent="Base.Theme.DayPalette" />

@@ -11,5 +11,6 @@ data class Holiday(
     @SerializedName("launchYear") val launchYear: Any? = null,
     @SerializedName("localName") val localName: String = "",
     @SerializedName("name") val name: String = "",
-    @SerializedName("types") val types: List<String> = listOf()
+    @SerializedName("types") val types: List<String> = listOf(),
+    @SerializedName("bgColor") var bgColor: Int = 0
 )

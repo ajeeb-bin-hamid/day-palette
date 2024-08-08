@@ -7,5 +7,6 @@
         <item name="android:colorBackground">@color/ink</item>
         <item name="colorOnBackground">@color/white</item>
         <item name="dividerColor">@color/slate</item>
+        <item name="shimmerColor">@color/concrete</item>
     </style>
 </resources>

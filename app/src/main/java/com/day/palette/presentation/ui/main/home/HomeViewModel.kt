@@ -1,5 +1,6 @@
 package com.day.palette.presentation.ui.main.home
 
+import android.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.day.palette.domain.GenericResult
@@ -15,6 +16,7 @@ import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -72,6 +74,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             when (val countryHolidays = getCountryHolidaysUseCase.execute(countryCode)) {
                 is GenericResult.Success -> {
+                    countryHolidays.data.forEach { item -> item.bgColor = getRandomDarkColor() }
                     intent { reduce { state.copy(countryHolidays = countryHolidays.data) } }
                 }
 
@@ -81,6 +84,25 @@ class HomeViewModel @Inject constructor(
             }
 
         }
+    }
+
+    private fun getRandomDarkColor(): Int {
+        var color: Int
+        // Generate a random color
+        do {
+            color = Color.rgb(Random.nextInt(256), Random.nextInt(256), Random.nextInt(256))
+        } while (isColorBright(color))
+        return color
+    }
+
+    private fun isColorBright(color: Int): Boolean {
+        val r = Color.red(color) / 255.0
+        val g = Color.green(color) / 255.0
+        val b = Color.blue(color) / 255.0
+
+        // Calculate luminance
+        val luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        return luminance > 0.5 // Bright color threshold
     }
 
     companion object {

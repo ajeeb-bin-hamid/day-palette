@@ -112,6 +112,9 @@ dependencies {
     implementation libs.orbit.core
     implementation libs.orbit.viewmodel
 
+    //Shimmer effect
+    implementation libs.skeletonlayout
+
 }
 
 // Allow references to generated code
