@@ -4,7 +4,7 @@
     <item android:gravity="top">
         <shape android:shape="rectangle">
             <size android:height="0.5dp" />
-            <solid android:color="?attr/dividerColor" />
+            <solid android:color="?attr/colorDivider" />
         </shape>
     </item>
 </layer-list>

@@ -59,15 +59,12 @@ class HomeFragment : Fragment() {
             skeleton.showSkeleton()
         }
 
-        println("infox. jj")
-
         return b.root
     }
 
 
     /**Observe changes in the State using Orbit StateFlow*/
     private fun observeState(state: HomeState) {
-        println("infox, hi")
         modifyTitle(state.selectedCountryName)
         modifyRecyclerView(state.countryHolidays)
     }
@@ -110,20 +107,15 @@ class HomeFragment : Fragment() {
             isNestedScrollingEnabled = false
             addItemDecoration(HomeRecyclerDecoration(requireContext().toPx(16)))
         }
-
     }
 
     private fun setUpSkeleton() {
         val maskTypedValue = TypedValue()
-        requireContext().theme.resolveAttribute(
-            com.google.android.material.R.attr.dividerColor, maskTypedValue, true
-        )
+        requireContext().theme.resolveAttribute(R.attr.colorDivider, maskTypedValue, true)
         val colorMask = ContextCompat.getColor(requireContext(), maskTypedValue.resourceId)
 
         val shimmerTypedValue = TypedValue()
-        requireContext().theme.resolveAttribute(
-            com.faltenreich.skeletonlayout.R.attr.shimmerColor, shimmerTypedValue, true
-        )
+        requireContext().theme.resolveAttribute(R.attr.colorShimmer, shimmerTypedValue, true)
         val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
 
         skeleton = b.homeFragmentRV.applySkeleton(R.layout.card_holiday_mini, 5).apply {
