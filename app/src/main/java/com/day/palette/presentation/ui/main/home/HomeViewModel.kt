@@ -1,6 +1,7 @@
 package com.day.palette.presentation.ui.main.home
 
 import android.graphics.Color
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.day.palette.domain.GenericResult
@@ -9,7 +10,6 @@ import com.day.palette.domain.usecase.GetSelectedCountryDetailsUseCase
 import com.day.palette.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -20,6 +20,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     getSelectedCountryDetailsUseCase: GetSelectedCountryDetailsUseCase,
     private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase
 ) : ViewModel(), ContainerHost<HomeState, HomeIntent> {
@@ -33,7 +34,7 @@ class HomeViewModel @Inject constructor(
         isLoading = false
     )
 
-    override val container: Container<HomeState, HomeIntent> = container(initialState)
+    override val container = container<HomeState, HomeIntent>(initialState, savedStateHandle)
 
     /**This block evaluates the shared preference use case call.
      * If the call is successful, the state is updated with the retrieved data.*/

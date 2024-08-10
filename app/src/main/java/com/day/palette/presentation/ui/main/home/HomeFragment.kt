@@ -59,6 +59,7 @@ class HomeFragment : Fragment() {
             skeleton.showSkeleton()
         }
 
+        println("infox. jj")
 
         return b.root
     }
@@ -66,6 +67,7 @@ class HomeFragment : Fragment() {
 
     /**Observe changes in the State using Orbit StateFlow*/
     private fun observeState(state: HomeState) {
+        println("infox, hi")
         modifyTitle(state.selectedCountryName)
         modifyRecyclerView(state.countryHolidays)
     }
