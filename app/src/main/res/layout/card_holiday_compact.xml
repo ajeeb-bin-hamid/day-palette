@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardHolidayMini"
+    android:id="@+id/cardHolidayCompact"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -23,13 +23,13 @@
             android:layout_height="match_parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cardHolidayMiniBgCL"
+            android:id="@+id/cardHolidayCompactBgCL"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/cardHolidayMiniDayTV"
+                android:id="@+id/cardHolidayCompactDayTV"
                 style="@style/Text.1.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,18 +40,18 @@
                 tools:text="02" />
 
             <TextView
-                android:id="@+id/cardHolidayMiniMonthTV"
+                android:id="@+id/cardHolidayCompactMonthTV"
                 style="@style/Text.4.SemiBold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:textColor="?attr/colorOnSecondary"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardHolidayMiniDayTV"
-                tools:text="Sep, 2024" />
+                app:layout_constraintTop_toBottomOf="@+id/cardHolidayCompactDayTV"
+                tools:text="Sept, 2024" />
 
             <TextView
-                android:id="@+id/cardHolidayMiniImportanceTV"
+                android:id="@+id/cardHolidayCompactImportanceTV"
                 style="@style/Text.4.SemiBold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

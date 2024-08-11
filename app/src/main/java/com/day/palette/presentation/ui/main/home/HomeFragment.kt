@@ -118,7 +118,7 @@ class HomeFragment : Fragment() {
         requireContext().theme.resolveAttribute(R.attr.colorShimmer, shimmerTypedValue, true)
         val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
 
-        skeleton = b.homeFragmentRV.applySkeleton(R.layout.card_holiday_mini, 5).apply {
+        skeleton = b.homeFragmentRV.applySkeleton(R.layout.card_holiday_compact, 5).apply {
             maskCornerRadius = requireContext().toPx(24).toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask

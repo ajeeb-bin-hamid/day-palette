@@ -108,6 +108,8 @@ dependencies {
 
     //Picker Actions for Espresso
     androidTestImplementation libs.espresso.contrib
+    //Idling registry support for Espresso
+    implementation libs.androidx.espresso.idling.resource
 
     //Orbit for state handling
     implementation libs.orbit.core

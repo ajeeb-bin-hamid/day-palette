@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.day.palette.databinding.CardHolidayMiniBinding
+import com.day.palette.databinding.CardHolidayCompactBinding
 import com.day.palette.domain.model.Holiday
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -17,16 +17,16 @@ class HomeRecyclerAdapter(
 
     private var onClickListener: OnClickListener? = null
 
-    class HomeRecyclerViewHolder(b: CardHolidayMiniBinding) : RecyclerView.ViewHolder(b.root) {
-        val cardHolidayMini = b.cardHolidayMini
-        val cardHolidayMiniBgCL = b.cardHolidayMiniBgCL
-        val cardHolidayMiniDayTV = b.cardHolidayMiniDayTV
-        val cardHolidayMiniMonthTV = b.cardHolidayMiniMonthTV
-        val cardHolidayMiniImportanceTV = b.cardHolidayMiniImportanceTV
+    class HomeRecyclerViewHolder(b: CardHolidayCompactBinding) : RecyclerView.ViewHolder(b.root) {
+        val cardHolidayCompact = b.cardHolidayCompact
+        val cardHolidayCompactBgCL = b.cardHolidayCompactBgCL
+        val cardHolidayCompactDayTV = b.cardHolidayCompactDayTV
+        val cardHolidayCompactMonthTV = b.cardHolidayCompactMonthTV
+        val cardHolidayCompactImportanceTV = b.cardHolidayCompactImportanceTV
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeRecyclerViewHolder {
-        val b = CardHolidayMiniBinding.inflate(
+        val b = CardHolidayCompactBinding.inflate(
             LayoutInflater.from(context), parent, false
         )
 
@@ -40,12 +40,12 @@ class HomeRecyclerAdapter(
     override fun onBindViewHolder(h: HomeRecyclerViewHolder, position: Int) {
         val holiday = countryHolidays[position]
 
-        h.cardHolidayMiniBgCL.setBackgroundColor(holiday.bgColor)
-        h.cardHolidayMiniDayTV.text = getFormattedDate(holiday.date, "dd")
-        h.cardHolidayMiniMonthTV.text = getFormattedDate(holiday.date, "MMM, yyyy")
-        h.cardHolidayMiniImportanceTV.text = holiday.name
+        h.cardHolidayCompactBgCL.setBackgroundColor(holiday.bgColor)
+        h.cardHolidayCompactDayTV.text = getFormattedDate(holiday.date, "dd")
+        h.cardHolidayCompactMonthTV.text = getFormattedDate(holiday.date, "MMM, yyyy")
+        h.cardHolidayCompactImportanceTV.text = holiday.name
 
-        h.cardHolidayMini.setOnClickListener {
+        h.cardHolidayCompact.setOnClickListener {
             if (onClickListener != null) {
                 onClickListener!!.onClick(position, holiday, it)
             }
@@ -55,11 +55,11 @@ class HomeRecyclerAdapter(
 
     private fun getFormattedDate(dateString: String, exp: String): String {
         // Define the date format
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         // Parse the date string into a Date object
         val date: Date = dateFormat.parse(dateString) ?: return ""
         // Define a format to extract only the day part
-        val dayFormat = SimpleDateFormat(exp, Locale.getDefault())
+        val dayFormat = SimpleDateFormat(exp, Locale.US)
         // Format the Date object to extract the day
         return dayFormat.format(date)
     }
