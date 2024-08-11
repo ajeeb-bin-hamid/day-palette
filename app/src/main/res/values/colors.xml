@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
+    <color name="buttercup_bliss">#FFFC00</color>
+    <color name="coal">#2A2A2A</color>
+    <color name="pearl">#E0E0E0</color>
+    <color name="slate">#565656</color>
+    <color name="ink">#050505</color>
+    <color name="blush">#EDEDED</color>
+    <color name="concrete">#6D6D6D</color>
 </resources>

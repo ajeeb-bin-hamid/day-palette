@@ -3,12 +3,15 @@ package com.day.palette
 import android.app.Activity
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.platform.app.InstrumentationRegistry
+import com.day.palette.data.utils.AppIdlingResource
 import com.day.palette.presentation.ui.main.MainActivity
 import io.cucumber.java.After
 import io.cucumber.java.Before
+import javax.inject.Inject
 
-class CucumberScenarioHolder {
+class CucumberScenarioHolder @Inject constructor(private val appIdlingResource: AppIdlingResource) {
 
     private var scenario: ActivityScenario<*>? = null
 
@@ -24,11 +27,17 @@ class CucumberScenarioHolder {
             }
         }
 
+        //Register the IdlingResource
+        IdlingRegistry.getInstance().register(appIdlingResource)
+
     }
 
     /**This function will be executed after each scenario, during which we will close the Scenario Holder.*/
     @After
     fun tearDown() {
         scenario?.close()
+
+        //Unregister the IdlingResource
+        IdlingRegistry.getInstance().unregister(appIdlingResource)
     }
 }

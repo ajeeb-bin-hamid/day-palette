@@ -1,9 +1,11 @@
 package com.day.palette.presentation.ui.main
 
-sealed class MainIntent {
-    /**vmActions - Actions can be invoked on the ViewModel*/
-    data object FetchData : MainIntent()
+import com.day.palette.presentation.utils.UiText
 
-    /**uiActions - Actions can be performed on the UI*/
-    data class ShowToast(val message: String) : MainIntent()
+sealed class MainIntent {
+    /**Actions that can be invoked on the ViewModel*/
+
+    /**Actions that can be performed on the UI*/
+    data class ShowToast(val message: UiText) : MainIntent()
+    data class ShowSnack(val message: UiText) : MainIntent()
 }

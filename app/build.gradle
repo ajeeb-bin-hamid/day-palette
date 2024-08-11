@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -32,10 +33,12 @@ android {
         dev {
             dimension "env"
             applicationIdSuffix ".dev"
+            buildConfigField("String", "BASE_URL", "\"${env.BASE_URL.value}\"")
         }
 
         prod {
             dimension "env"
+            buildConfigField("String", "BASE_URL", "\"${env.BASE_URL.value}\"")
         }
     }
     compileOptions {
@@ -70,6 +73,7 @@ dependencies {
 
     // Lifecycle
     implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.fragment.ktx
 
     // Coroutines
     implementation libs.kotlinx.coroutines.core
@@ -104,10 +108,15 @@ dependencies {
 
     //Picker Actions for Espresso
     androidTestImplementation libs.espresso.contrib
+    //Idling registry support for Espresso
+    implementation libs.androidx.espresso.idling.resource
 
     //Orbit for state handling
     implementation libs.orbit.core
     implementation libs.orbit.viewmodel
+
+    //Shimmer effect
+    implementation libs.skeletonlayout
 
 }
 

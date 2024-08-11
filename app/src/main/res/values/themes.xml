@@ -1,9 +1,186 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.DayPalette" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/buttercup_bliss</item>
+        <item name="colorOnPrimary">@color/coal</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="colorOnBackground">@color/coal</item>
+        <item name="colorDivider">@color/pearl</item>
+        <item name="colorShimmer">@color/blush</item>
     </style>
 
     <style name="Theme.DayPalette" parent="Base.Theme.DayPalette" />
+
+    <!--    Custom styles-->
+
+    <!--    Styles related to text-->
+    <style name="Text" parent="">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!--    Define Regular text styles-->
+    <style name="Text.Regular" parent="Text">
+        <item name="android:fontFamily">@font/poppins_regular</item>
+    </style>
+
+    <style name="Text.1" parent="Text.Regular">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Text.2" parent="Text.Regular">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.3" parent="Text.Regular">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.4" parent="Text.Regular">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.5" parent="Text.Regular">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.6" parent="Text.Regular">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!--    Define Medium text styles-->
+    <style name="Text.Medium" parent="Text">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+    </style>
+
+    <style name="Text.1.Medium" parent="Text.Medium">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Text.2.Medium" parent="Text.Medium">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.3.Medium" parent="Text.Medium">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.4.Medium" parent="Text.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.5.Medium" parent="Text.Medium">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.6.Medium" parent="Text.Medium">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!--    Define Semi Bold text styles-->
+    <style name="Text.SemiBold" parent="Text">
+        <item name="android:fontFamily">@font/poppins_semi_bold</item>
+    </style>
+
+    <style name="Text.1.SemiBold" parent="Text.SemiBold">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Text.2.SemiBold" parent="Text.SemiBold">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.3.SemiBold" parent="Text.SemiBold">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.4.SemiBold" parent="Text.SemiBold">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.5.SemiBold" parent="Text.SemiBold">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.6.SemiBold" parent="Text.SemiBold">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!--    Define Semi Bold Italic text styles-->
+    <style name="Text.SemiBoldItalic" parent="Text">
+        <item name="android:fontFamily">@font/poppins_semi_bold_italic</item>
+    </style>
+
+    <style name="Text.1.SemiBoldItalic" parent="Text.SemiBoldItalic">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Text.2.SemiBoldItalic" parent="Text.SemiBoldItalic">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.3.SemiBoldItalic" parent="Text.SemiBoldItalic">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.4.SemiBoldItalic" parent="Text.SemiBoldItalic">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.5.SemiBoldItalic" parent="Text.SemiBoldItalic">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.6.SemiBoldItalic" parent="Text.SemiBoldItalic">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!--    Define Bold Italic text styles-->
+    <style name="Text.Bold" parent="Text">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+    </style>
+
+    <style name="Text.1.Bold" parent="Text.Bold">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Text.2.Bold" parent="Text.Bold">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.3.Bold" parent="Text.Bold">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.4.Bold" parent="Text.Bold">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.5.Bold" parent="Text.Bold">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.6.Bold" parent="Text.Bold">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!--    Customize the tab indicator inside bottom bar-->
+    <style name="App.Bar.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/buttercup_bliss</item>
+    </style>
+
+    <!--    Styles used to customize text inside bottom bar-->
+    <style name="Text.Bar.Active" parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/poppins_bold</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Text.Bar.InActive" parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>
