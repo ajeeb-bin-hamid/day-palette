@@ -12,6 +12,7 @@ import com.day.palette.R
 import com.day.palette.databinding.ActivityMainBinding
 import com.day.palette.presentation.ui.main.explore.ExploreFragment
 import com.day.palette.presentation.ui.main.home.HomeFragment
+import com.day.palette.presentation.ui.main.home.HomeFragment.Companion
 import com.day.palette.presentation.ui.main.memories.MemoriesFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,24 +39,34 @@ class MainActivity : AppCompatActivity() {
 
         vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
 
+        //Perform all the UI setup here
         setUpBottomBar()
+
+        //Check if UI component is recreating itself
+        if (savedInstanceState != null) {
+            // Restore the state of the BottomNavigationView
+            val selectedItemId =
+                savedInstanceState.getInt(INSTANCE_BOTTOM_BAR_SELECTED_ITEM, R.id.bottom_bar_home)
+            b.mainActivityBottomBar.selectedItemId = selectedItemId
+        }
 
     }
 
     /**Observe changes in the State using Orbit StateFlow*/
     private fun observeState(state: MainState) {
-        println("infox, ${state.isLoading}")
+        //
     }
 
     /**Observe side effects using Orbit StateFlow*/
     private fun observeIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.ShowToast -> {
-                Toast.makeText(this@MainActivity, intent.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, intent.message.asString(this), Toast.LENGTH_SHORT)
+                    .show()
             }
 
             is MainIntent.ShowSnack -> {
-                Snackbar.make(b.root, intent.message, Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(b.root, intent.message.asString(this), Snackbar.LENGTH_SHORT).show()
             }
 
             else -> {
@@ -102,5 +113,20 @@ class MainActivity : AppCompatActivity() {
                 true
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        // Save the ID of the selected menu item
+        val selectedItemId = b.mainActivityBottomBar.selectedItemId
+
+        outState.putBoolean(INSTANCE_POPULATED, true)
+        outState.putInt(INSTANCE_BOTTOM_BAR_SELECTED_ITEM, selectedItemId)
+        super.onSaveInstanceState(outState)
+    }
+
+    companion object {
+        //keys for handling savedInstanceState
+        const val INSTANCE_POPULATED = "instance_populated"
+        const val INSTANCE_BOTTOM_BAR_SELECTED_ITEM = "instance_bottom_bar_selected_item"
     }
 }
