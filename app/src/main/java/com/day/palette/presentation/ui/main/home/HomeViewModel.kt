@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.day.palette.domain.GenericResult
+import com.day.palette.domain.usecase.GetAllCountriesUseCase
 import com.day.palette.domain.usecase.GetCountryHolidaysUseCase
 import com.day.palette.domain.usecase.GetSelectedCountryDetailsUseCase
 import com.day.palette.presentation.utils.asUiText
@@ -22,7 +23,8 @@ import kotlin.random.Random
 class HomeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getSelectedCountryDetailsUseCase: GetSelectedCountryDetailsUseCase,
-    private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase
+    private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase,
+    private val getAllCountriesUseCase: GetAllCountriesUseCase
 ) : ViewModel(), ContainerHost<HomeState, HomeIntent> {
 
     private val selectedCountryDetails = getSelectedCountryDetailsUseCase.execute()
@@ -31,6 +33,7 @@ class HomeViewModel @Inject constructor(
         selectedCountryName = DEFAULT_COUNTRY_NAME,
         selectedCountryCode = DEFAULT_COUNTRY_CODE,
         countryHolidays = emptyList(),
+        allCountries = emptyList(),
         isLoading = false
     )
 
@@ -57,12 +60,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /**Public function exposed to UI components such as Activities and Fragments,
+    /**Public function exposed to UI components such as Activities, Fragments & Bottom sheets,
      * allowing them to invoke operations on this ViewModel.*/
     fun invoke(action: HomeIntent) = intent {
         when (action) {
             HomeIntent.GetCountryHolidays -> {
                 getCountryHolidays(state.selectedCountryCode)
+            }
+
+            HomeIntent.GetAllCountries -> {
+                getAllCountries()
             }
 
             else -> {
@@ -84,6 +91,20 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
+        }
+    }
+
+    private fun getAllCountries() {
+        viewModelScope.launch {
+            when (val allCountries = getAllCountriesUseCase.execute()) {
+                is GenericResult.Success -> {
+                    intent { reduce { state.copy(allCountries = allCountries.data) } }
+                }
+
+                is GenericResult.Error -> {
+                    intent { postSideEffect(HomeIntent.ShowToast(allCountries.error.asUiText())) }
+                }
+            }
         }
     }
 

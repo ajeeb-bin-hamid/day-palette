@@ -10,4 +10,7 @@
     <color name="ink">#050505</color>
     <color name="blush">#EDEDED</color>
     <color name="concrete">#6D6D6D</color>
+    <color name="valencia">#F4F4F4</color>
+    <color name="charcoal">#3A3A3A</color>
+    <color name="silver">#969696</color>
 </resources>

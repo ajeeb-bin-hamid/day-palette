@@ -13,11 +13,12 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.domain.model.Holiday
+import com.day.palette.presentation.ui.main.home.sheets.ChangeCountrySheet
 import com.day.palette.presentation.utils.TypefaceSpan
 import com.day.palette.presentation.utils.parcelable
 import com.day.palette.presentation.utils.toPx
@@ -32,7 +33,7 @@ import org.orbitmvi.orbit.viewmodel.observe
 class HomeFragment : Fragment() {
 
     private lateinit var b: FragmentHomeBinding
-    private val vm: HomeViewModel by viewModels()
+    private val vm: HomeViewModel by activityViewModels()
 
     private lateinit var recyclerAdapter: HomeRecyclerAdapter
     private lateinit var skeleton: Skeleton
@@ -48,6 +49,7 @@ class HomeFragment : Fragment() {
         //Perform all the UI setup here
         setUpRecyclerView()
         setUpSkeleton()
+        setUpListeners()
 
         //Check if UI component is recreating itself
         if (savedInstanceState != null) {
@@ -123,6 +125,16 @@ class HomeFragment : Fragment() {
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer
+        }
+    }
+
+    private fun setUpListeners() {
+        b.homeFragmentChangeCountryButton.setOnClickListener {
+            activity?.let {
+                ChangeCountrySheet().show(
+                    it.supportFragmentManager, ChangeCountrySheet.TAG
+                )
+            }
         }
     }
 

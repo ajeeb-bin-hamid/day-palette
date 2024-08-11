@@ -68,6 +68,7 @@ class HomeRecyclerAdapter(
         val startIndex = countryHolidays.size
         countryHolidays.addAll(newItems)
         notifyItemRangeInserted(startIndex, newItems.size)
+        println("infox, yoyo")
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

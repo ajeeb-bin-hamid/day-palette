@@ -16,7 +16,8 @@ class MainViewModel @Inject constructor(
     override val container = container<MainState, MainIntent>(MainState(), savedStateHandle)
 
 
-    /**This function is used by UI component to invoke any actions on the ViewModel*/
+    /**Public function exposed to UI components such as Activities, Fragments & Bottom sheets,
+     * allowing them to invoke operations on this ViewModel.*/
     fun invoke(action: MainIntent) = intent {
         //
     }

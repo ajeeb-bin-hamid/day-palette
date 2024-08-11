@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/changeCountrySheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="16dp"
+        android:background="@drawable/bg_bottom_sheet"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/changeCountrySheetIndicator"
+            android:layout_width="96dp"
+            android:layout_height="3dp"
+            android:background="@drawable/bg_bottom_sheet_indicator" />
+
+        <EditText
+            android:id="@+id/changeCountrySheetET"
+            style="@style/Text.4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="32dp"
+            android:autofillHints=""
+            android:background="@drawable/bg_search_bar"
+            android:drawableStart="@drawable/ico_search_country"
+            android:drawablePadding="8dp"
+            android:hint="@string/search_country"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:textColorHint="@color/silver" />
+
+        <View
+            android:id="@+id/changeCountrySheetDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="?attr/colorDivider" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/changeCountrySheetRV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/card_change_country" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
