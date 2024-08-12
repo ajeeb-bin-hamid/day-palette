@@ -5,9 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.day.palette.domain.GenericResult
+import com.day.palette.domain.model.SelectedCountryDetails
 import com.day.palette.domain.usecase.GetAllCountriesUseCase
 import com.day.palette.domain.usecase.GetCountryHolidaysUseCase
 import com.day.palette.domain.usecase.GetSelectedCountryDetailsUseCase
+import com.day.palette.domain.usecase.SetSelectedCountryDetailsUseCase
 import com.day.palette.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,10 +26,9 @@ class HomeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getSelectedCountryDetailsUseCase: GetSelectedCountryDetailsUseCase,
     private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase,
-    private val getAllCountriesUseCase: GetAllCountriesUseCase
+    private val getAllCountriesUseCase: GetAllCountriesUseCase,
+    private val setSelectedCountryDetailsUseCase: SetSelectedCountryDetailsUseCase
 ) : ViewModel(), ContainerHost<HomeState, HomeIntent> {
-
-    private val selectedCountryDetails = getSelectedCountryDetailsUseCase.execute()
 
     private val initialState = HomeState(
         selectedCountryName = DEFAULT_COUNTRY_NAME,
@@ -42,7 +43,7 @@ class HomeViewModel @Inject constructor(
     /**This block evaluates the shared preference use case call.
      * If the call is successful, the state is updated with the retrieved data.*/
     init {
-        when (selectedCountryDetails) {
+        when (val selectedCountryDetails = getSelectedCountryDetailsUseCase.execute()) {
             is GenericResult.Success -> {
                 intent {
                     reduce {
@@ -64,12 +65,16 @@ class HomeViewModel @Inject constructor(
      * allowing them to invoke operations on this ViewModel.*/
     fun invoke(action: HomeIntent) = intent {
         when (action) {
-            HomeIntent.GetCountryHolidays -> {
+            is HomeIntent.GetCountryHolidays -> {
                 getCountryHolidays(state.selectedCountryCode)
             }
 
-            HomeIntent.GetAllCountries -> {
+            is HomeIntent.GetAllCountries -> {
                 getAllCountries()
+            }
+
+            is HomeIntent.SetSelectedCountry -> {
+                setSelectedCountry(action.selectedCountryDetails)
             }
 
             else -> {
@@ -98,12 +103,35 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             when (val allCountries = getAllCountriesUseCase.execute()) {
                 is GenericResult.Success -> {
+                    allCountries.data.find { it.code == container.stateFlow.value.selectedCountryCode }?.isSelected =
+                        true
                     intent { reduce { state.copy(allCountries = allCountries.data) } }
                 }
 
                 is GenericResult.Error -> {
                     intent { postSideEffect(HomeIntent.ShowToast(allCountries.error.asUiText())) }
                 }
+            }
+        }
+    }
+
+    private fun setSelectedCountry(selectedCountryDetails: SelectedCountryDetails) {
+        when (val setSelectedCountryCall =
+            setSelectedCountryDetailsUseCase.execute(selectedCountryDetails)) {
+            is GenericResult.Success -> {
+                intent {
+                    reduce {
+                        state.copy(
+                            selectedCountryName = selectedCountryDetails.selectedCountryName,
+                            selectedCountryCode = selectedCountryDetails.selectedCountryCode
+                        )
+                    }
+                    postSideEffect(HomeIntent.GetCountryHolidays)
+                }
+            }
+
+            is GenericResult.Error -> {
+                intent { postSideEffect(HomeIntent.ShowSnack(setSelectedCountryCall.error.asUiText())) }
             }
         }
     }

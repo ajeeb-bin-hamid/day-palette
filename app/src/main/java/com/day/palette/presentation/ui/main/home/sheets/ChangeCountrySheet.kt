@@ -9,14 +9,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.day.palette.R
 import com.day.palette.databinding.SheetChangeCountryBinding
 import com.day.palette.domain.model.Country
+import com.day.palette.domain.model.SelectedCountryDetails
 import com.day.palette.presentation.ui.main.home.HomeIntent
-import com.day.palette.presentation.ui.main.home.HomeRecyclerDecoration
 import com.day.palette.presentation.ui.main.home.HomeState
 import com.day.palette.presentation.ui.main.home.HomeViewModel
+import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.parcelable
 import com.day.palette.presentation.utils.toPx
 import com.faltenreich.skeletonlayout.Skeleton
@@ -24,6 +26,8 @@ import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.viewmodel.observe
 
 class ChangeCountrySheet : BottomSheetDialogFragment() {
@@ -55,11 +59,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         //Perform all the UI setup here
         setUpRecyclerView()
         setUpSkeleton()
-
-
-        b.changeCountrySheetET.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        setUpSearchEditText()
 
         //Check if UI component is recreating itself
         if (savedInstanceState != null) {
@@ -84,8 +84,18 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
     private fun setUpRecyclerView() {
         recyclerAdapter = ChangeCountryRecyclerAdapter(requireContext(), ArrayList()).apply {
             setOnClickListener(object : ChangeCountryRecyclerAdapter.OnClickListener {
-                override fun onClick(position: Int, holiday: Country, view: View) {
-                    //
+                override fun onClick(position: Int, country: Country, view: View) {
+                    lifecycleScope.launch {
+                        delay(200)
+                        dismiss()
+                        vm.invoke(
+                            HomeIntent.SetSelectedCountry(
+                                SelectedCountryDetails(
+                                    country.name, country.code
+                                )
+                            )
+                        )
+                    }
                 }
             })
         }
@@ -93,8 +103,13 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         b.changeCountrySheetRV.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recyclerAdapter
-            isNestedScrollingEnabled = false
-            addItemDecoration(HomeRecyclerDecoration(requireContext().toPx(16)))
+            isNestedScrollingEnabled = true
+            itemDecoration(margin = requireContext().toPx(16)) { outRect, position, margin ->
+                if (position == 0) outRect.top = margin
+                outRect.left = margin
+                outRect.right = margin
+                outRect.bottom = margin
+            }
         }
     }
 
@@ -107,11 +122,17 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         requireContext().theme.resolveAttribute(R.attr.colorShimmer, shimmerTypedValue, true)
         val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
 
-        skeleton = b.changeCountrySheetRV.applySkeleton(R.layout.card_change_country, 5).apply {
+        skeleton = b.changeCountrySheetRV.applySkeleton(R.layout.card_change_country, 10).apply {
             maskCornerRadius = requireContext().toPx(24).toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer
+        }
+    }
+
+    private fun setUpSearchEditText() {
+        b.changeCountrySheetET.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
 

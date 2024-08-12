@@ -65,10 +65,20 @@ class HomeRecyclerAdapter(
     }
 
     fun appendItems(newItems: List<Holiday>) {
-        val startIndex = countryHolidays.size
-        countryHolidays.addAll(newItems)
-        notifyItemRangeInserted(startIndex, newItems.size)
-        println("infox, yoyo")
+        val currentCountryCode = countryHolidays.getOrNull(0)
+        val newCountryCode = newItems.getOrNull(0)
+
+        if (currentCountryCode != null && newCountryCode != null && currentCountryCode == newCountryCode) {
+            //Pagination is happening for the existing country
+            val startIndex = countryHolidays.size
+            countryHolidays.addAll(newItems)
+            notifyItemRangeInserted(startIndex, newItems.size)
+        } else {
+            //A new country is added to the RecyclerView, hence clear the old data
+            countryHolidays.clear()
+            countryHolidays.addAll(newItems)
+            notifyItemRangeInserted(0, newItems.size)
+        }
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

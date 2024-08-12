@@ -3,10 +3,10 @@ package com.day.palette.data.di
 import com.day.palette.BuildConfig
 import com.day.palette.data.network.ApiService
 import com.day.palette.data.network.IdlingResourceInterceptor
-import com.day.palette.data.utils.AppIdlingResource
 import com.day.palette.data.prefs.SharedPrefsHelper
 import com.day.palette.data.repository.RemoteRepositoryImpl
 import com.day.palette.data.repository.UserPrefsRepositoryImpl
+import com.day.palette.data.utils.AppIdlingResource
 import com.day.palette.domain.repository.RemoteRepository
 import com.day.palette.domain.repository.UserPrefsRepository
 import dagger.Module
@@ -16,6 +16,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -34,7 +35,8 @@ class DataModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(idlingResourceInterceptor: IdlingResourceInterceptor): OkHttpClient =
-        OkHttpClient.Builder().addInterceptor(idlingResourceInterceptor).build()
+        OkHttpClient.Builder().connectTimeout(1, TimeUnit.MINUTES)
+            .addInterceptor(idlingResourceInterceptor).build()
 
     @Provides
     @Singleton

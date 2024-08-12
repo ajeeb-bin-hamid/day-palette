@@ -20,6 +20,7 @@ import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.ui.main.home.sheets.ChangeCountrySheet
 import com.day.palette.presentation.utils.TypefaceSpan
+import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.parcelable
 import com.day.palette.presentation.utils.toPx
 import com.faltenreich.skeletonlayout.Skeleton
@@ -87,6 +88,12 @@ class HomeFragment : Fragment() {
                 }
             }
 
+            is HomeIntent.GetCountryHolidays -> {
+                //API call to fetch selected country holidays
+                vm.invoke(HomeIntent.GetCountryHolidays)
+                skeleton.showSkeleton()
+            }
+
             else -> {
                 //
             }
@@ -107,7 +114,12 @@ class HomeFragment : Fragment() {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = recyclerAdapter
             isNestedScrollingEnabled = false
-            addItemDecoration(HomeRecyclerDecoration(requireContext().toPx(16)))
+            itemDecoration(margin = requireContext().toPx(16)) { outRect, position, margin ->
+                if (position == 0 || position == 1) outRect.top = margin
+                if (position % 2 == 0) outRect.right = margin / 2
+                if (position % 2 == 1) outRect.left = margin / 2
+                outRect.bottom = margin
+            }
         }
     }
 
@@ -163,7 +175,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun modifyRecyclerView(countryHolidays: List<Holiday>) {
-        if (countryHolidays.size > recyclerAdapter.itemCount) {
+        if (countryHolidays.isNotEmpty()) {
             recyclerAdapter.appendItems(countryHolidays)
             skeleton.showOriginal()
         }

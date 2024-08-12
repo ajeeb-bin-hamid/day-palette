@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.day.palette.databinding.CardChangeCountryBinding
 import com.day.palette.domain.model.Country
-import com.day.palette.domain.model.Holiday
 
 class ChangeCountryRecyclerAdapter(
     private val context: Context, private val allCountries: ArrayList<Country>
@@ -38,12 +37,21 @@ class ChangeCountryRecyclerAdapter(
         val country = allCountries[position]
 
         h.cardChangeCountryRB.text = country.name
+        h.cardChangeCountryRB.isChecked = country.isSelected
 
-        /* h.cardChangeCountryRB.setOnClickListener {
-             if (onClickListener != null) {
-                 onClickListener!!.onClick(position, holiday, it)
-             }
-         }*/
+
+        h.cardChangeCountryRB.setOnClickListener { view ->
+            val currentSelectedCountryIndex = allCountries.indexOfFirst { it.isSelected }
+            if (currentSelectedCountryIndex != -1) allCountries.find { it.isSelected }?.isSelected =
+                false
+
+            allCountries.find { it.code == country.code }?.isSelected = true
+
+            if (currentSelectedCountryIndex != -1) notifyItemChanged(currentSelectedCountryIndex)
+            //   notifyItemChanged(position)
+
+            onClickListener?.onClick(position, country, view)
+        }
 
     }
 
@@ -59,6 +67,6 @@ class ChangeCountryRecyclerAdapter(
     }
 
     interface OnClickListener {
-        fun onClick(position: Int, holiday: Country, view: View)
+        fun onClick(position: Int, country: Country, view: View)
     }
 }
