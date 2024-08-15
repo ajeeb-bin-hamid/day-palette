@@ -110,18 +110,18 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             val keyboardHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
 
-            context?.let { ctx ->
+            context?.let { cxt ->
                 if (isKeyboardVisible) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                     availableScreenSpace = availableScreenSpace - keyboardHeight + systemBars.bottom
                     bottomSheetBehavior.peekHeight = displayMetrics.heightPixels - keyboardHeight
                 } else {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    availableScreenSpace = getScreenHeight(ctx)
+                    availableScreenSpace = getScreenHeight(cxt)
                 }
 
                 b.changeCountrySheetRV.apply {
-                    animateHeight(calculateDesiredHeight(adapter?.itemCount ?: 1))
+                    animateHeight(calculateDesiredHeight(cxt, adapter?.itemCount ?: 1))
                 }
             }
 
@@ -170,10 +170,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setUpSearchEditText() {/*   b.changeCountrySheetET.setOnFocusChangeListener { _, hasFocus ->
-               if (hasFocus) bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-           }*/
-
+    private fun setUpSearchEditText() {
         b.changeCountrySheetET.onTextChanged(afterTextChanged = { searchString ->
             debounceJob?.cancel()
             debounceJob = lifecycleScope.launch {
@@ -214,15 +211,12 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         return screenHeight - context.toPx(margin)
     }
 
-    private fun calculateDesiredHeight(itemCount: Int): Int {
-        context?.let { ctx ->
-            val itemHeight = ctx.toPx(48)
-            val contentHeight = (itemCount * itemHeight) + ctx.toPx(16)
+    private fun calculateDesiredHeight(context: Context, itemCount: Int): Int {
+        val itemHeight = context.toPx(48)
+        val contentHeight = (itemCount * itemHeight) + context.toPx(16)
 
-            // Use contentHeight if it's less than screenHeight, otherwise match_parent
-            return if (contentHeight < availableScreenSpace) contentHeight else availableScreenSpace
-        }
-        return availableScreenSpace
+        // Use contentHeight if it's less than screenHeight, otherwise match_parent
+        return if (contentHeight < availableScreenSpace) contentHeight else availableScreenSpace
     }
 
 

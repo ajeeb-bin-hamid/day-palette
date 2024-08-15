@@ -10,7 +10,6 @@ import com.day.palette.databinding.CardHolidayCompactBinding
 import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.utils.diffCallback
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class HomeRecyclerAdapter(
@@ -55,25 +54,22 @@ class HomeRecyclerAdapter(
 
     }
 
-    private fun getFormattedDate(dateString: String, exp: String): String {
-        // Define the date format
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        // Parse the date string into a Date object
-        val date: Date = dateFormat.parse(dateString) ?: return ""
-        // Define a format to extract only the day part
-        val dayFormat = SimpleDateFormat(exp, Locale.US)
-        // Format the Date object to extract the day
-        return dayFormat.format(date)
-    }
-
     fun updateItems(newItems: ArrayList<Holiday>) {
-        val diffCallback = diffCallback(oldList = countryHolidays,
+        val diffCallback = diffCallback(
+            oldList = countryHolidays,
             newList = newItems,
-            areItemsTheSame = { oldItem, newItem -> oldItem.bgColor == newItem.bgColor })
+            areItemsTheSame = { oldItem, newItem ->
+                "${oldItem.countryCode}${oldItem.name}" == "${newItem.countryCode}${newItem.name}"
+            })
 
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         countryHolidays = newItems
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    private fun getFormattedDate(dateString: String, exp: String): String {
+        val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(dateString) ?: return ""
+        return SimpleDateFormat(exp, Locale.US).format(date)
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {
