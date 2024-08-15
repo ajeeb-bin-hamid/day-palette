@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class RemoteRepositoryImpl @Inject constructor(private val apiService: ApiService) :
     RemoteRepository {
-    override suspend fun getCountryHolidays(countryCode: String): GenericResult<List<Holiday>, Errors.Network> {
+    override suspend fun getCountryHolidays(countryCode: String): GenericResult<ArrayList<Holiday>, Errors.Network> {
 
         val response = apiService.getCountryHolidays(countryCode)
         val body = response.body() ?: return GenericResult.Error(Errors.Network.NO_RESPONSE)

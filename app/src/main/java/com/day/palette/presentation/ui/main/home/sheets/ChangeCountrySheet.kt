@@ -1,13 +1,18 @@
 package com.day.palette.presentation.ui.main.home.sheets
 
 import android.app.Dialog
+import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +24,7 @@ import com.day.palette.presentation.ui.main.home.HomeIntent
 import com.day.palette.presentation.ui.main.home.HomeState
 import com.day.palette.presentation.ui.main.home.HomeViewModel
 import com.day.palette.presentation.utils.itemDecoration
+import com.day.palette.presentation.utils.onTextChanged
 import com.day.palette.presentation.utils.parcelable
 import com.day.palette.presentation.utils.toPx
 import com.faltenreich.skeletonlayout.Skeleton
@@ -26,11 +32,19 @@ import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.viewmodel.observe
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class ChangeCountrySheet : BottomSheetDialogFragment() {
+
+    @Inject
+    lateinit var displayMetrics: DisplayMetrics
 
     private lateinit var b: SheetChangeCountryBinding
     private val vm: HomeViewModel by activityViewModels()
@@ -38,6 +52,10 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
     private lateinit var recyclerAdapter: ChangeCountryRecyclerAdapter
     private lateinit var skeleton: Skeleton
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+
+    private var debounceJob: Job? = null
+
+    private var availableScreenSpace: Int = 0
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -57,6 +75,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         vm.observe(this, state = ::observeState)
 
         //Perform all the UI setup here
+        setUpInsets()
         setUpRecyclerView()
         setUpSkeleton()
         setUpSearchEditText()
@@ -81,21 +100,40 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         modifyRecyclerView(state.allCountries)
     }
 
+    private fun setUpInsets() {
+        availableScreenSpace = getScreenHeight(requireContext())
+        ViewCompat.setOnApplyWindowInsetsListener(
+            requireActivity().window.decorView
+        ) { _: View?, insets: WindowInsetsCompat ->
+
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val keyboardHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+
+            context?.let { ctx ->
+                if (isKeyboardVisible) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    availableScreenSpace = availableScreenSpace - keyboardHeight + systemBars.bottom
+                    bottomSheetBehavior.peekHeight = displayMetrics.heightPixels - keyboardHeight
+                } else {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    availableScreenSpace = getScreenHeight(ctx)
+                }
+
+                b.changeCountrySheetRV.apply {
+                    animateHeight(calculateDesiredHeight(adapter?.itemCount ?: 1))
+                }
+            }
+
+            insets
+        }
+    }
+
     private fun setUpRecyclerView() {
         recyclerAdapter = ChangeCountryRecyclerAdapter(requireContext(), ArrayList()).apply {
             setOnClickListener(object : ChangeCountryRecyclerAdapter.OnClickListener {
                 override fun onClick(position: Int, country: Country, view: View) {
-                    lifecycleScope.launch {
-                        delay(200)
-                        dismiss()
-                        vm.invoke(
-                            HomeIntent.SetSelectedCountry(
-                                SelectedCountryDetails(
-                                    country.name, country.code
-                                )
-                            )
-                        )
-                    }
+                    onClickCountry(country)
                 }
             })
         }
@@ -104,6 +142,8 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recyclerAdapter
             isNestedScrollingEnabled = true
+            setNoResultView(b.changeCountrySheetNoResultView.root)
+            layoutParams.height = getScreenHeight(requireContext())
             itemDecoration(margin = requireContext().toPx(16)) { outRect, position, margin ->
                 if (position == 0) outRect.top = margin
                 outRect.left = margin
@@ -130,18 +170,61 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setUpSearchEditText() {
-        b.changeCountrySheetET.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+    private fun setUpSearchEditText() {/*   b.changeCountrySheetET.setOnFocusChangeListener { _, hasFocus ->
+               if (hasFocus) bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+           }*/
+
+        b.changeCountrySheetET.onTextChanged(afterTextChanged = { searchString ->
+            debounceJob?.cancel()
+            debounceJob = lifecycleScope.launch {
+                delay(200)
+                val searchResults = vm.container.stateFlow.value.allCountries.filter {
+                    it.name.contains(
+                        searchString, ignoreCase = true
+                    ) || it.code.contains(searchString, ignoreCase = true)
+                }
+                recyclerAdapter.addItems(
+                    searchResults, b.changeCountrySheetRV, availableScreenSpace
+                )
+            }
+        })
+    }
+
+
+    private fun modifyRecyclerView(allCountries: List<Country>) {
+        if (allCountries.isNotEmpty()) {
+            recyclerAdapter.addItems(allCountries, b.changeCountrySheetRV, availableScreenSpace)
+            if (skeleton.isSkeleton()) skeleton.showOriginal()
         }
     }
 
-    private fun modifyRecyclerView(allCountries: List<Country>) {
-        if (allCountries.size > recyclerAdapter.itemCount) {
-            recyclerAdapter.appendItems(allCountries)
-            skeleton.showOriginal()
+    private fun onClickCountry(country: Country) {
+        lifecycleScope.launch {
+            delay(200)
+            dismiss()
+            vm.invoke(
+                HomeIntent.SetSelectedCountry(SelectedCountryDetails(country.name, country.code))
+            )
         }
     }
+
+    private fun getScreenHeight(context: Context): Int {
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+        val margin = 16 + 40 + 32 + 4 + 16
+        return screenHeight - context.toPx(margin)
+    }
+
+    private fun calculateDesiredHeight(itemCount: Int): Int {
+        context?.let { ctx ->
+            val itemHeight = ctx.toPx(48)
+            val contentHeight = (itemCount * itemHeight) + ctx.toPx(16)
+
+            // Use contentHeight if it's less than screenHeight, otherwise match_parent
+            return if (contentHeight < availableScreenSpace) contentHeight else availableScreenSpace
+        }
+        return availableScreenSpace
+    }
+
 
     override fun getTheme(): Int = R.style.Sheet_ColorSystem
 

@@ -45,21 +45,23 @@ class HomeFragment : Fragment() {
 
         //Initialize View binding & setup Viewmodel observers
         b = FragmentHomeBinding.inflate(inflater, container, false)
-        vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
+        vm.observe(this, state = ::observeState, sideEffect = ::observeSideEffect)
 
         //Perform all the UI setup here
         setUpRecyclerView()
         setUpSkeleton()
-        setUpListeners()
+        setUpChangeCountryButton()
 
         //Check if UI component is recreating itself
         if (savedInstanceState != null) {
             val recyclerState = savedInstanceState.parcelable<Parcelable>(INSTANCE_RECYCLER_STATE)
             b.homeFragmentRV.layoutManager?.onRestoreInstanceState(recyclerState)
         } else {
-            //API call to fetch selected country holidays
-            vm.invoke(HomeIntent.GetCountryHolidays)
-            skeleton.showSkeleton()
+            //Fetch all country holidays only if the data is not in the ViewModel
+            if (vm.container.stateFlow.value.countryHolidays.isEmpty()) {
+                vm.invoke(HomeIntent.GetCountryHolidays)
+                skeleton.showSkeleton()
+            }
         }
 
         return b.root
@@ -73,29 +75,24 @@ class HomeFragment : Fragment() {
     }
 
     /**Observe side effects using Orbit StateFlow*/
-    private fun observeIntent(intent: HomeIntent) {
+    private fun observeSideEffect(intent: HomeSideEffect) {
         when (intent) {
-            is HomeIntent.ShowToast -> {
+            is HomeSideEffect.ShowToast -> {
                 context?.let {
                     Toast.makeText(it, intent.message.asString(it), Toast.LENGTH_SHORT).show()
                 }
-
             }
 
-            is HomeIntent.ShowSnack -> {
+            is HomeSideEffect.ShowSnack -> {
                 context?.let {
                     Snackbar.make(b.root, intent.message.asString(it), Snackbar.LENGTH_SHORT).show()
                 }
             }
 
-            is HomeIntent.GetCountryHolidays -> {
+            is HomeSideEffect.GetCountryHolidays -> {
                 //API call to fetch selected country holidays
                 vm.invoke(HomeIntent.GetCountryHolidays)
                 skeleton.showSkeleton()
-            }
-
-            else -> {
-                //
             }
         }
     }
@@ -106,7 +103,6 @@ class HomeFragment : Fragment() {
                 override fun onClick(position: Int, holiday: Holiday, view: View) {
                     //
                 }
-
             })
         }
 
@@ -140,7 +136,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setUpListeners() {
+    private fun setUpChangeCountryButton() {
         b.homeFragmentChangeCountryButton.setOnClickListener {
             activity?.let {
                 ChangeCountrySheet().show(
@@ -174,10 +170,10 @@ class HomeFragment : Fragment() {
 
     }
 
-    private fun modifyRecyclerView(countryHolidays: List<Holiday>) {
+    private fun modifyRecyclerView(countryHolidays: ArrayList<Holiday>) {
         if (countryHolidays.isNotEmpty()) {
-            recyclerAdapter.appendItems(countryHolidays)
-            skeleton.showOriginal()
+            recyclerAdapter.updateItems(countryHolidays)
+            if (skeleton.isSkeleton()) skeleton.showOriginal()
         }
     }
 

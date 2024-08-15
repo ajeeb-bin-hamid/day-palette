@@ -4,12 +4,16 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.day.palette.databinding.CardChangeCountryBinding
 import com.day.palette.domain.model.Country
+import com.day.palette.presentation.utils.AdaptiveRecyclerView
+import com.day.palette.presentation.utils.diffCallback
+import com.day.palette.presentation.utils.toPx
 
 class ChangeCountryRecyclerAdapter(
-    private val context: Context, private val allCountries: ArrayList<Country>
+    private val context: Context, private var allCountries: List<Country>
 ) : RecyclerView.Adapter<ChangeCountryRecyclerAdapter.ChangeCountryRecyclerViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
@@ -41,14 +45,13 @@ class ChangeCountryRecyclerAdapter(
 
 
         h.cardChangeCountryRB.setOnClickListener { view ->
-            val currentSelectedCountryIndex = allCountries.indexOfFirst { it.isSelected }
-            if (currentSelectedCountryIndex != -1) allCountries.find { it.isSelected }?.isSelected =
-                false
+            /*        val currentSelectedCountryIndex = allCountries.indexOfFirst { it.isSelected }
+                    if (currentSelectedCountryIndex != -1) allCountries.find { it.isSelected }?.isSelected =
+                        false
 
-            allCountries.find { it.code == country.code }?.isSelected = true
+                    allCountries.find { it.code == country.code }?.isSelected = true
 
-            if (currentSelectedCountryIndex != -1) notifyItemChanged(currentSelectedCountryIndex)
-            //   notifyItemChanged(position)
+                    if (currentSelectedCountryIndex != -1) notifyItemChanged(currentSelectedCountryIndex)*/
 
             onClickListener?.onClick(position, country, view)
         }
@@ -56,10 +59,26 @@ class ChangeCountryRecyclerAdapter(
     }
 
 
-    fun appendItems(newItems: List<Country>) {
-        val startIndex = allCountries.size
-        allCountries.addAll(newItems)
-        notifyItemRangeInserted(startIndex, newItems.size)
+    fun addItems(newItems: List<Country>, recyclerView: AdaptiveRecyclerView, screenHeight: Int) {
+        val diffCallback = diffCallback(oldList = allCountries,
+            newList = newItems,
+            areItemsTheSame = { oldItem, newItem -> oldItem.code == newItem.code })
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        // Calculate the desired height based on the new data
+        val newHeight = calculateDesiredHeight(newItems, screenHeight)
+        recyclerView.animateHeight(newHeight)
+
+        allCountries = newItems
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    private fun calculateDesiredHeight(newItems: List<Country>, screenHeight: Int): Int {
+        val itemHeight = context.toPx(48)
+        val contentHeight = (newItems.size * itemHeight) + context.toPx(16)
+
+        // Use contentHeight if it's less than screenHeight, otherwise match_parent
+        return if (contentHeight < screenHeight) contentHeight else screenHeight
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

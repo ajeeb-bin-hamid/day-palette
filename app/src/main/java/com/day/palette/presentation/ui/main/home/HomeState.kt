@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class HomeState(
     val selectedCountryName: String,
     val selectedCountryCode: String,
-    val countryHolidays: List<Holiday>,
+    val countryHolidays: ArrayList<Holiday>,
     val allCountries: List<Country>,
     val isLoading: Boolean
 ) : Parcelable

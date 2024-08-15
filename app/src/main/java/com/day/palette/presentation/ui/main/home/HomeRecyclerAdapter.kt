@@ -4,15 +4,17 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.day.palette.databinding.CardHolidayCompactBinding
 import com.day.palette.domain.model.Holiday
+import com.day.palette.presentation.utils.diffCallback
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class HomeRecyclerAdapter(
-    private val context: Context, private val countryHolidays: ArrayList<Holiday>
+    private val context: Context, private var countryHolidays: ArrayList<Holiday>
 ) : RecyclerView.Adapter<HomeRecyclerAdapter.HomeRecyclerViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
@@ -64,21 +66,14 @@ class HomeRecyclerAdapter(
         return dayFormat.format(date)
     }
 
-    fun appendItems(newItems: List<Holiday>) {
-        val currentCountryCode = countryHolidays.getOrNull(0)
-        val newCountryCode = newItems.getOrNull(0)
+    fun updateItems(newItems: ArrayList<Holiday>) {
+        val diffCallback = diffCallback(oldList = countryHolidays,
+            newList = newItems,
+            areItemsTheSame = { oldItem, newItem -> oldItem.bgColor == newItem.bgColor })
 
-        if (currentCountryCode != null && newCountryCode != null && currentCountryCode == newCountryCode) {
-            //Pagination is happening for the existing country
-            val startIndex = countryHolidays.size
-            countryHolidays.addAll(newItems)
-            notifyItemRangeInserted(startIndex, newItems.size)
-        } else {
-            //A new country is added to the RecyclerView, hence clear the old data
-            countryHolidays.clear()
-            countryHolidays.addAll(newItems)
-            notifyItemRangeInserted(0, newItems.size)
-        }
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        countryHolidays = newItems
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

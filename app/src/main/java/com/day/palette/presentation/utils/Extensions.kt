@@ -5,8 +5,12 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
+import android.widget.EditText
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 /**This extension converts integer values into the corresponding DP (density-independent pixels) values needed for UI elements.*/
@@ -35,4 +39,43 @@ inline fun RecyclerView.itemDecoration(
         }
     }
     addItemDecoration(decoration)
+}
+
+/**This extension streamlines the implementation of TextChangeListener for TextView elements,
+ * eliminating unnecessary boilerplate code.*/
+fun EditText.onTextChanged(
+    afterTextChanged: (String) -> Unit,
+    beforeTextChanged: (CharSequence, Int, Int, Int) -> Unit = { _, _, _, _ -> },
+    onTextChanged: (CharSequence, Int, Int, Int) -> Unit = { _, _, _, _ -> }
+) {
+    addTextChangedListener(object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            afterTextChanged(s.toString())
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            beforeTextChanged(s ?: "", start, count, after)
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            onTextChanged(s ?: "", start, before, count)
+        }
+    })
+}
+
+/**his extension returns a new DiffUtil.Callback initialized with the provided arguments,
+ * making it easier to update items in a RecyclerView.*/
+fun <T> diffCallback(
+    oldList: List<T>,
+    newList: List<T>,
+    areItemsTheSame: (oldItem: T, newItem: T) -> Boolean,
+    areContentsTheSame: (oldItem: T, newItem: T) -> Boolean = { oldItem, newItem -> oldItem == newItem }
+): DiffUtil.Callback = object : DiffUtil.Callback() {
+    override fun getOldListSize(): Int = oldList.size
+    override fun getNewListSize(): Int = newList.size
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
 }

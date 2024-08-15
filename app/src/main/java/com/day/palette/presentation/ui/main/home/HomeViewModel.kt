@@ -18,6 +18,7 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.util.ArrayList
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -28,17 +29,17 @@ class HomeViewModel @Inject constructor(
     private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase,
     private val getAllCountriesUseCase: GetAllCountriesUseCase,
     private val setSelectedCountryDetailsUseCase: SetSelectedCountryDetailsUseCase
-) : ViewModel(), ContainerHost<HomeState, HomeIntent> {
+) : ViewModel(), ContainerHost<HomeState, HomeSideEffect> {
 
     private val initialState = HomeState(
         selectedCountryName = DEFAULT_COUNTRY_NAME,
         selectedCountryCode = DEFAULT_COUNTRY_CODE,
-        countryHolidays = emptyList(),
+        countryHolidays = ArrayList(),
         allCountries = emptyList(),
         isLoading = false
     )
 
-    override val container = container<HomeState, HomeIntent>(initialState, savedStateHandle)
+    override val container = container<HomeState, HomeSideEffect>(initialState, savedStateHandle)
 
     /**This block evaluates the shared preference use case call.
      * If the call is successful, the state is updated with the retrieved data.*/
@@ -61,8 +62,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /**Public function exposed to UI components such as Activities, Fragments & Bottom sheets,
-     * allowing them to invoke operations on this ViewModel.*/
+    /**Public function exposed to UI components such as Activities, Fragments, and Bottom Sheets,
+     * allowing them to perform operations on this ViewModel.
+     * Do not call these functions or any functions declared within them directly from the ViewModel.
+     * Instead, use side effects to invoke these functions from the UI components.*/
     fun invoke(action: HomeIntent) = intent {
         when (action) {
             is HomeIntent.GetCountryHolidays -> {
@@ -76,23 +79,19 @@ class HomeViewModel @Inject constructor(
             is HomeIntent.SetSelectedCountry -> {
                 setSelectedCountry(action.selectedCountryDetails)
             }
-
-            else -> {
-                //
-            }
         }
     }
 
     private fun getCountryHolidays(countryCode: String) {
         viewModelScope.launch {
-            when (val countryHolidays = getCountryHolidaysUseCase.execute(countryCode)) {
+            when (val countryHolidaysCall = getCountryHolidaysUseCase.execute(countryCode)) {
                 is GenericResult.Success -> {
-                    countryHolidays.data.forEach { item -> item.bgColor = getRandomDarkColor() }
-                    intent { reduce { state.copy(countryHolidays = countryHolidays.data) } }
+                    countryHolidaysCall.data.forEach { item -> item.bgColor = getRandomDarkColor() }
+                    intent { reduce { state.copy(countryHolidays = countryHolidaysCall.data) } }
                 }
 
                 is GenericResult.Error -> {
-                    intent { postSideEffect(HomeIntent.ShowSnack(countryHolidays.error.asUiText())) }
+                    intent { postSideEffect(HomeSideEffect.ShowSnack(countryHolidaysCall.error.asUiText())) }
                 }
             }
 
@@ -101,15 +100,15 @@ class HomeViewModel @Inject constructor(
 
     private fun getAllCountries() {
         viewModelScope.launch {
-            when (val allCountries = getAllCountriesUseCase.execute()) {
+            when (val allCountriesCall = getAllCountriesUseCase.execute()) {
                 is GenericResult.Success -> {
-                    allCountries.data.find { it.code == container.stateFlow.value.selectedCountryCode }?.isSelected =
+                    allCountriesCall.data.find { it.code == container.stateFlow.value.selectedCountryCode }?.isSelected =
                         true
-                    intent { reduce { state.copy(allCountries = allCountries.data) } }
+                    intent { reduce { state.copy(allCountries = allCountriesCall.data) } }
                 }
 
                 is GenericResult.Error -> {
-                    intent { postSideEffect(HomeIntent.ShowToast(allCountries.error.asUiText())) }
+                    intent { postSideEffect(HomeSideEffect.ShowToast(allCountriesCall.error.asUiText())) }
                 }
             }
         }
@@ -119,19 +118,24 @@ class HomeViewModel @Inject constructor(
         when (val setSelectedCountryCall =
             setSelectedCountryDetailsUseCase.execute(selectedCountryDetails)) {
             is GenericResult.Success -> {
+                val allCountries = container.stateFlow.value.allCountries
+                allCountries.find { it.isSelected }?.isSelected = false
+                allCountries.find { it.code == selectedCountryDetails.selectedCountryCode }?.isSelected =
+                    true
                 intent {
                     reduce {
                         state.copy(
                             selectedCountryName = selectedCountryDetails.selectedCountryName,
-                            selectedCountryCode = selectedCountryDetails.selectedCountryCode
+                            selectedCountryCode = selectedCountryDetails.selectedCountryCode,
+                            allCountries = allCountries
                         )
                     }
-                    postSideEffect(HomeIntent.GetCountryHolidays)
+                    postSideEffect(HomeSideEffect.GetCountryHolidays)
                 }
             }
 
             is GenericResult.Error -> {
-                intent { postSideEffect(HomeIntent.ShowSnack(setSelectedCountryCall.error.asUiText())) }
+                intent { postSideEffect(HomeSideEffect.ShowSnack(setSelectedCountryCall.error.asUiText())) }
             }
         }
     }
