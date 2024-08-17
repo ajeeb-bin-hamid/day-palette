@@ -9,8 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.day.palette.databinding.CardHolidayCompactBinding
 import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.utils.diffCallback
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.day.palette.presentation.utils.getFormattedDate
 
 class HomeRecyclerAdapter(
     private val context: Context, private var countryHolidays: ArrayList<Holiday>
@@ -42,8 +41,8 @@ class HomeRecyclerAdapter(
         val holiday = countryHolidays[position]
 
         h.cardHolidayCompactBgCL.setBackgroundColor(holiday.bgColor)
-        h.cardHolidayCompactDayTV.text = getFormattedDate(holiday.date, "dd")
-        h.cardHolidayCompactMonthTV.text = getFormattedDate(holiday.date, "MMM, yyyy")
+        h.cardHolidayCompactDayTV.text = holiday.date.getFormattedDate("dd")
+        h.cardHolidayCompactMonthTV.text = holiday.date.getFormattedDate("MMM, yyyy")
         h.cardHolidayCompactImportanceTV.text = holiday.name
 
         h.cardHolidayCompact.setOnClickListener {
@@ -65,11 +64,6 @@ class HomeRecyclerAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         countryHolidays = newItems
         diffResult.dispatchUpdatesTo(this)
-    }
-
-    private fun getFormattedDate(dateString: String, exp: String): String {
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(dateString) ?: return ""
-        return SimpleDateFormat(exp, Locale.US).format(date)
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

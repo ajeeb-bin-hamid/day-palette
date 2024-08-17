@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.EditText
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**This extension converts integer values into the corresponding DP (density-independent pixels) values needed for UI elements.*/
 fun Context.toPx(dp: Int): Int = TypedValue.applyDimension(
@@ -63,7 +65,7 @@ fun EditText.onTextChanged(
     })
 }
 
-/**his extension returns a new DiffUtil.Callback initialized with the provided arguments,
+/**This extension returns a new DiffUtil.Callback initialized with the provided arguments,
  * making it easier to update items in a RecyclerView.*/
 fun <T> diffCallback(
     oldList: List<T>,
@@ -78,4 +80,11 @@ fun <T> diffCallback(
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
         areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+}
+
+/**This extension parses a given date in the yyyy-MM-dd format and
+ * returns it formatted according to the specified expression.*/
+fun String.getFormattedDate(exp: String): String {
+    val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(this) ?: return ""
+    return SimpleDateFormat(exp, Locale.US).format(date)
 }

@@ -2,7 +2,7 @@ package com.day.palette.data.di
 
 import com.day.palette.BuildConfig
 import com.day.palette.data.network.ApiService
-import com.day.palette.data.network.IdlingResourceInterceptor
+import com.day.palette.data.network.NetworkInterceptor
 import com.day.palette.data.prefs.SharedPrefsHelper
 import com.day.palette.data.repository.RemoteRepositoryImpl
 import com.day.palette.data.repository.UserPrefsRepositoryImpl
@@ -25,18 +25,18 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideNetworkIdlingResource(): AppIdlingResource = AppIdlingResource()
+    fun provideAppIdlingResource(): AppIdlingResource = AppIdlingResource()
 
     @Provides
     @Singleton
-    fun provideIdlingResourceInterceptor(appIdlingResource: AppIdlingResource): IdlingResourceInterceptor =
-        IdlingResourceInterceptor(appIdlingResource)
+    fun provideNetworkInterceptor(appIdlingResource: AppIdlingResource): NetworkInterceptor =
+        NetworkInterceptor(appIdlingResource)
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(idlingResourceInterceptor: IdlingResourceInterceptor): OkHttpClient =
+    fun provideOkHttpClient(networkInterceptor: NetworkInterceptor): OkHttpClient =
         OkHttpClient.Builder().connectTimeout(1, TimeUnit.MINUTES)
-            .addInterceptor(idlingResourceInterceptor).build()
+            .addInterceptor(networkInterceptor).build()
 
     @Provides
     @Singleton
