@@ -1,6 +1,6 @@
 package com.day.palette.presentation.utils
 
-import android.content.Context
+import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -16,9 +16,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**This extension converts integer values into the corresponding DP (density-independent pixels) values needed for UI elements.*/
-fun Context.toPx(dp: Int): Int = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), resources.displayMetrics
-).toInt()
+inline val Int.dp: Int
+    get() = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
+    ).toInt()
 
 /**This extension leverages the latest methods for handling Parcelable data on newer Android versions
  * while also providing backward compatibility for older versions using deprecated methods.*/

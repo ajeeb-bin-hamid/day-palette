@@ -44,14 +44,4 @@ class DataModule {
         Retrofit.Builder().baseUrl(BuildConfig.BASE_URL).client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()).build()
             .create(ApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideUserPrefsRepository(sharedPrefsHelper: SharedPrefsHelper): UserPrefsRepository =
-        UserPrefsRepositoryImpl(sharedPrefsHelper)
-
-    @Provides
-    @Singleton
-    fun provideRemoteRepository(apiService: ApiService): RemoteRepository =
-        RemoteRepositoryImpl(apiService)
 }

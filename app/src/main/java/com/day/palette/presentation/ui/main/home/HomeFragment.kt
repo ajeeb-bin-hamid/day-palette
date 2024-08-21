@@ -20,9 +20,9 @@ import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.ui.main.home.sheets.ChangeCountrySheet
 import com.day.palette.presentation.utils.TypefaceSpan
+import com.day.palette.presentation.utils.dp
 import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.parcelable
-import com.day.palette.presentation.utils.toPx
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.snackbar.Snackbar
@@ -110,7 +110,8 @@ class HomeFragment : Fragment() {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = recyclerAdapter
             isNestedScrollingEnabled = false
-            itemDecoration(margin = requireContext().toPx(16)) { outRect, position, margin ->
+
+            itemDecoration(margin = 16.dp) { outRect, position, margin ->
                 if (position == 0 || position == 1) outRect.top = margin
                 if (position % 2 == 0) outRect.right = margin / 2
                 if (position % 2 == 1) outRect.left = margin / 2
@@ -129,7 +130,7 @@ class HomeFragment : Fragment() {
         val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
 
         skeleton = b.homeFragmentRV.applySkeleton(R.layout.card_holiday_compact, 5).apply {
-            maskCornerRadius = requireContext().toPx(24).toFloat()
+            maskCornerRadius = 16.dp.toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer

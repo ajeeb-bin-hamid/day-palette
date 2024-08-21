@@ -1,7 +1,6 @@
 package com.day.palette.presentation.ui.main.home.sheets
 
 import android.app.Dialog
-import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
 import android.os.Parcelable
@@ -23,10 +22,10 @@ import com.day.palette.domain.model.SelectedCountryDetails
 import com.day.palette.presentation.ui.main.home.HomeIntent
 import com.day.palette.presentation.ui.main.home.HomeState
 import com.day.palette.presentation.ui.main.home.HomeViewModel
+import com.day.palette.presentation.utils.dp
 import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.onTextChanged
 import com.day.palette.presentation.utils.parcelable
-import com.day.palette.presentation.utils.toPx
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -101,7 +100,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
     }
 
     private fun setUpInsets() {
-        availableScreenSpace = getScreenHeight(requireContext())
+        availableScreenSpace = getScreenHeight()
         ViewCompat.setOnApplyWindowInsetsListener(
             requireActivity().window.decorView
         ) { _: View?, insets: WindowInsetsCompat ->
@@ -110,20 +109,19 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             val keyboardHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
 
-            context?.let { cxt ->
-                if (isKeyboardVisible) {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    availableScreenSpace = availableScreenSpace - keyboardHeight + systemBars.bottom
-                    bottomSheetBehavior.peekHeight = displayMetrics.heightPixels - keyboardHeight
-                } else {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    availableScreenSpace = getScreenHeight(cxt)
-                }
-
-                b.changeCountrySheetRV.apply {
-                    animateHeight(calculateDesiredHeight(cxt, adapter?.itemCount ?: 1))
-                }
+            if (isKeyboardVisible) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                availableScreenSpace = availableScreenSpace - keyboardHeight + systemBars.bottom
+                bottomSheetBehavior.peekHeight = displayMetrics.heightPixels - keyboardHeight
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                availableScreenSpace = getScreenHeight()
             }
+
+            b.changeCountrySheetRV.apply {
+                animateHeight(calculateDesiredHeight(adapter?.itemCount ?: 1))
+            }
+
 
             insets
         }
@@ -143,8 +141,8 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             adapter = recyclerAdapter
             isNestedScrollingEnabled = true
             setNoResultView(b.changeCountrySheetNoResultView.root)
-            layoutParams.height = getScreenHeight(requireContext())
-            itemDecoration(margin = requireContext().toPx(16)) { outRect, position, margin ->
+            layoutParams.height = getScreenHeight()
+            itemDecoration(16.dp) { outRect, position, margin ->
                 if (position == 0) outRect.top = margin
                 outRect.left = margin
                 outRect.right = margin
@@ -163,7 +161,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
 
         skeleton = b.changeCountrySheetRV.applySkeleton(R.layout.card_change_country, 10).apply {
-            maskCornerRadius = requireContext().toPx(24).toFloat()
+            maskCornerRadius = 16.dp.toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer
@@ -205,15 +203,15 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun getScreenHeight(context: Context): Int {
+    private fun getScreenHeight(): Int {
         val screenHeight = Resources.getSystem().displayMetrics.heightPixels
         val margin = 16 + 40 + 32 + 4 + 16
-        return screenHeight - context.toPx(margin)
+        return screenHeight - margin.dp
     }
 
-    private fun calculateDesiredHeight(context: Context, itemCount: Int): Int {
-        val itemHeight = context.toPx(48)
-        val contentHeight = (itemCount * itemHeight) + context.toPx(16)
+    private fun calculateDesiredHeight(itemCount: Int): Int {
+        val itemHeight = 48.dp
+        val contentHeight = (itemCount * itemHeight) + 16.dp
 
         // Use contentHeight if it's less than screenHeight, otherwise match_parent
         return if (contentHeight < availableScreenSpace) contentHeight else availableScreenSpace

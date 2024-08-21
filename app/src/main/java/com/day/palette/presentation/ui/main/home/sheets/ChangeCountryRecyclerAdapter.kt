@@ -10,7 +10,7 @@ import com.day.palette.databinding.CardChangeCountryBinding
 import com.day.palette.domain.model.Country
 import com.day.palette.presentation.utils.AdaptiveRecyclerView
 import com.day.palette.presentation.utils.diffCallback
-import com.day.palette.presentation.utils.toPx
+import com.day.palette.presentation.utils.dp
 
 class ChangeCountryRecyclerAdapter(
     private val context: Context, private var allCountries: List<Country>
@@ -74,8 +74,8 @@ class ChangeCountryRecyclerAdapter(
     }
 
     private fun calculateDesiredHeight(newItems: List<Country>, screenHeight: Int): Int {
-        val itemHeight = context.toPx(48)
-        val contentHeight = (newItems.size * itemHeight) + context.toPx(16)
+        val itemHeight = 48.dp
+        val contentHeight = (newItems.size * itemHeight) + 16.dp
 
         // Use contentHeight if it's less than screenHeight, otherwise match_parent
         return if (contentHeight < screenHeight) contentHeight else screenHeight
