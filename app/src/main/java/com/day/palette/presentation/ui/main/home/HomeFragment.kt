@@ -5,12 +5,9 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.text.Spannable
 import android.text.SpannableString
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,13 +16,21 @@ import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.domain.model.Holiday
 import com.day.palette.presentation.ui.main.home.sheets.ChangeCountrySheet
+import com.day.palette.presentation.utils.DP
+import com.day.palette.presentation.utils.INSTANCE_POPULATED
+import com.day.palette.presentation.utils.INSTANCE_RECYCLER_STATE
+import com.day.palette.presentation.utils.RECYCLER_ITEM_PARENT
 import com.day.palette.presentation.utils.TypefaceSpan
-import com.day.palette.presentation.utils.dp
+import com.day.palette.presentation.utils.currentState
+import com.day.palette.presentation.utils.getThemeColor
 import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.parcelable
+import com.day.palette.presentation.utils.setOnItemClickListener
+import com.day.palette.presentation.utils.setOnItemLongPressListener
+import com.day.palette.presentation.utils.showSnack
+import com.day.palette.presentation.utils.showToast
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.orbitmvi.orbit.viewmodel.observe
 
@@ -58,10 +63,7 @@ class HomeFragment : Fragment() {
             b.homeFragmentRV.layoutManager?.onRestoreInstanceState(recyclerState)
         } else {
             //Fetch all country holidays only if the data is not in the ViewModel
-            if (vm.container.stateFlow.value.countryHolidays.isEmpty()) {
-                vm.invoke(HomeIntent.GetCountryHolidays)
-                skeleton.showSkeleton()
-            }
+            if (vm.currentState.countryHolidays.isEmpty()) getCountryHolidays()
         }
 
         return b.root
@@ -75,43 +77,30 @@ class HomeFragment : Fragment() {
     }
 
     /**Observe side effects using Orbit StateFlow*/
-    private fun observeSideEffect(intent: HomeSideEffect) {
-        when (intent) {
-            is HomeSideEffect.ShowToast -> {
-                context?.let {
-                    Toast.makeText(it, intent.message.asString(it), Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            is HomeSideEffect.ShowSnack -> {
-                context?.let {
-                    Snackbar.make(b.root, intent.message.asString(it), Snackbar.LENGTH_SHORT).show()
-                }
-            }
-
-            is HomeSideEffect.GetCountryHolidays -> {
-                //API call to fetch selected country holidays
-                vm.invoke(HomeIntent.GetCountryHolidays)
-                skeleton.showSkeleton()
-            }
+    private fun observeSideEffect(action: HomeSideEffect) {
+        when (action) {
+            is HomeSideEffect.ShowToast -> context?.showToast(action.message)
+            is HomeSideEffect.ShowSnack -> context?.showSnack(b.root, action.message)
+            is HomeSideEffect.GetCountryHolidays -> getCountryHolidays()
         }
     }
 
     private fun setUpRecyclerView() {
         recyclerAdapter = HomeRecyclerAdapter(requireContext(), ArrayList()).apply {
-            setOnClickListener(object : HomeRecyclerAdapter.OnClickListener {
-                override fun onClick(position: Int, holiday: Holiday, view: View) {
-                    //
+            setOnItemClickListener { position, holiday, type ->
+                when(type) {
+                    RECYCLER_ITEM_PARENT -> {
+                        //
+                    }
                 }
-            })
+            }
         }
 
         b.homeFragmentRV.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = recyclerAdapter
             isNestedScrollingEnabled = false
-
-            itemDecoration(margin = 16.dp) { outRect, position, margin ->
+            itemDecoration(margin = 16.DP) { outRect, position, margin ->
                 if (position == 0 || position == 1) outRect.top = margin
                 if (position % 2 == 0) outRect.right = margin / 2
                 if (position % 2 == 1) outRect.left = margin / 2
@@ -121,16 +110,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUpSkeleton() {
-        val maskTypedValue = TypedValue()
-        requireContext().theme.resolveAttribute(R.attr.colorDivider, maskTypedValue, true)
-        val colorMask = ContextCompat.getColor(requireContext(), maskTypedValue.resourceId)
-
-        val shimmerTypedValue = TypedValue()
-        requireContext().theme.resolveAttribute(R.attr.colorShimmer, shimmerTypedValue, true)
-        val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
+        val colorMask = requireContext().getThemeColor(id = R.attr.colorDivider)
+        val colorShimmer = requireContext().getThemeColor(id = R.attr.colorShimmer)
 
         skeleton = b.homeFragmentRV.applySkeleton(R.layout.card_holiday_compact, 5).apply {
-            maskCornerRadius = 16.dp.toFloat()
+            maskCornerRadius = 16.DP.toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer
@@ -178,6 +162,11 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun getCountryHolidays() {
+        vm.invoke(HomeIntent.GetCountryHolidays)
+        skeleton.showSkeleton()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(INSTANCE_POPULATED, true)
         outState.putParcelable(
@@ -185,11 +174,4 @@ class HomeFragment : Fragment() {
         )
         super.onSaveInstanceState(outState)
     }
-
-    companion object {
-        //keys for handling savedInstanceState
-        const val INSTANCE_POPULATED = "instance_populated"
-        const val INSTANCE_RECYCLER_STATE = "instance_recycler_state"
-    }
-
 }

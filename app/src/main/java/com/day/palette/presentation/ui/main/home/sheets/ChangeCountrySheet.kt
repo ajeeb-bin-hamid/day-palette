@@ -5,11 +5,9 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.activityViewModels
@@ -22,10 +20,16 @@ import com.day.palette.domain.model.SelectedCountryDetails
 import com.day.palette.presentation.ui.main.home.HomeIntent
 import com.day.palette.presentation.ui.main.home.HomeState
 import com.day.palette.presentation.ui.main.home.HomeViewModel
-import com.day.palette.presentation.utils.dp
+import com.day.palette.presentation.utils.DP
+import com.day.palette.presentation.utils.INSTANCE_POPULATED
+import com.day.palette.presentation.utils.INSTANCE_RECYCLER_STATE
+import com.day.palette.presentation.utils.RECYCLER_ITEM_PARENT
+import com.day.palette.presentation.utils.currentState
+import com.day.palette.presentation.utils.getThemeColor
 import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.onTextChanged
 import com.day.palette.presentation.utils.parcelable
+import com.day.palette.presentation.utils.setOnItemClickListener
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -85,7 +89,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             b.changeCountrySheetRV.layoutManager?.onRestoreInstanceState(recyclerState)
         } else {
             //Fetch all countries only if the data is not in the ViewModel
-            if (vm.container.stateFlow.value.allCountries.isEmpty()) {
+            if (vm.currentState.allCountries.isEmpty()) {
                 vm.invoke(HomeIntent.GetAllCountries)
                 skeleton.showSkeleton()
             }
@@ -121,19 +125,17 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             b.changeCountrySheetRV.apply {
                 animateHeight(calculateDesiredHeight(adapter?.itemCount ?: 1))
             }
-
-
             insets
         }
     }
 
     private fun setUpRecyclerView() {
         recyclerAdapter = ChangeCountryRecyclerAdapter(requireContext(), ArrayList()).apply {
-            setOnClickListener(object : ChangeCountryRecyclerAdapter.OnClickListener {
-                override fun onClick(position: Int, country: Country, view: View) {
-                    onClickCountry(country)
+            setOnItemClickListener { _, country, type ->
+                when (type) {
+                    RECYCLER_ITEM_PARENT -> onClickCountry(country)
                 }
-            })
+            }
         }
 
         b.changeCountrySheetRV.apply {
@@ -142,7 +144,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             isNestedScrollingEnabled = true
             setNoResultView(b.changeCountrySheetNoResultView.root)
             layoutParams.height = getScreenHeight()
-            itemDecoration(16.dp) { outRect, position, margin ->
+            itemDecoration(margin = 16.DP) { outRect, position, margin ->
                 if (position == 0) outRect.top = margin
                 outRect.left = margin
                 outRect.right = margin
@@ -152,16 +154,11 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
     }
 
     private fun setUpSkeleton() {
-        val maskTypedValue = TypedValue()
-        requireContext().theme.resolveAttribute(R.attr.colorDivider, maskTypedValue, true)
-        val colorMask = ContextCompat.getColor(requireContext(), maskTypedValue.resourceId)
-
-        val shimmerTypedValue = TypedValue()
-        requireContext().theme.resolveAttribute(R.attr.colorShimmer, shimmerTypedValue, true)
-        val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
+        val colorMask = requireContext().getThemeColor(id = R.attr.colorDivider)
+        val colorShimmer = requireContext().getThemeColor(id = R.attr.colorShimmer)
 
         skeleton = b.changeCountrySheetRV.applySkeleton(R.layout.card_change_country, 10).apply {
-            maskCornerRadius = 16.dp.toFloat()
+            maskCornerRadius = 16.DP.toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer
@@ -173,7 +170,7 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
             debounceJob?.cancel()
             debounceJob = lifecycleScope.launch {
                 delay(200)
-                val searchResults = vm.container.stateFlow.value.allCountries.filter {
+                val searchResults = vm.currentState.allCountries.filter {
                     it.name.contains(
                         searchString, ignoreCase = true
                     ) || it.code.contains(searchString, ignoreCase = true)
@@ -197,21 +194,23 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
         lifecycleScope.launch {
             delay(200)
             dismiss()
-            vm.invoke(
-                HomeIntent.SetSelectedCountry(SelectedCountryDetails(country.name, country.code))
+
+            val selectedCountry = SelectedCountryDetails(
+                selectedCountryName = country.name, selectedCountryCode = country.code
             )
+            vm.invoke(HomeIntent.SetSelectedCountry(selectedCountry))
         }
     }
 
     private fun getScreenHeight(): Int {
         val screenHeight = Resources.getSystem().displayMetrics.heightPixels
         val margin = 16 + 40 + 32 + 4 + 16
-        return screenHeight - margin.dp
+        return screenHeight - margin.DP
     }
 
     private fun calculateDesiredHeight(itemCount: Int): Int {
-        val itemHeight = 48.dp
-        val contentHeight = (itemCount * itemHeight) + 16.dp
+        val itemHeight = 48.DP
+        val contentHeight = (itemCount * itemHeight) + 16.DP
 
         // Use contentHeight if it's less than screenHeight, otherwise match_parent
         return if (contentHeight < availableScreenSpace) contentHeight else availableScreenSpace
@@ -230,9 +229,5 @@ class ChangeCountrySheet : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "ChangeCountrySheet"
-
-        //keys for handling savedInstanceState
-        const val INSTANCE_POPULATED = "instance_populated"
-        const val INSTANCE_RECYCLER_STATE = "instance_recycler_state"
     }
 }

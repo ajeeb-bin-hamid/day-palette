@@ -1,5 +1,6 @@
 package com.day.palette.presentation.utils
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Build
@@ -10,13 +11,38 @@ import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.day.palette.R
+import com.day.palette.domain.utils.Errors.Network
+import com.day.palette.domain.utils.Errors.Prefs
+import com.day.palette.domain.utils.GenericError
+import com.google.android.material.snackbar.Snackbar
+import org.orbitmvi.orbit.ContainerHost
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**This extension converts all GenericErrors into their corresponding string literals.*/
+fun GenericError.asUiText(): UiText {
+    return when (this) {
+        //Errors that can occur while performing network calls
+        Network.NO_RESPONSE -> UiText.StringResource(R.string.error_no_response)
+        Network.NO_INTERNET -> UiText.StringResource(R.string.error_no_internet)
+        Network.REQUEST_TIMEOUT -> UiText.StringResource(R.string.error_request_timeout)
+        Network.INTERNAL_ERROR -> UiText.StringResource(R.string.error_internal_error)
+        Network.PAYLOAD_TOO_LARGE -> UiText.StringResource(R.string.error_payload_too_large)
+        Network.UNKNOWN -> UiText.StringResource(R.string.error_unknown)
+
+        //Errors that can occur while performing operations on SharedPreferences
+        Prefs.NO_SUCH_DATA -> UiText.StringResource(R.string.error_not_data_found)
+        Prefs.UNKNOWN -> UiText.StringResource(R.string.error_unknown)
+    }
+}
+
 /**This extension converts integer values into the corresponding DP (density-independent pixels) values needed for UI elements.*/
-inline val Int.dp: Int
+inline val Int.DP: Int
     get() = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
     ).toInt()
@@ -89,4 +115,40 @@ fun <T> diffCallback(
 fun String.getFormattedDate(exp: String): String {
     val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(this) ?: return ""
     return SimpleDateFormat(exp, Locale.US).format(date)
+}
+
+/**This extension simplifies displaying Toast messages by eliminating repetitive boilerplate code.*/
+fun Context.showToast(uiText: UiText, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, uiText.asString(this), duration).show()
+}
+
+/**This extension allows to display a Snackbar without redundant boilerplate code.*/
+fun Context.showSnack(view: View, uiText: UiText, duration: Int = Snackbar.LENGTH_SHORT) {
+    Snackbar.make(view, uiText.asString(this), duration).show()
+}
+
+/**This extension helps retrieve colors based on the app's applied theme.*/
+fun Context.getThemeColor(id: Int): Int {
+    val maskTypedValue = TypedValue()
+    theme.resolveAttribute(id, maskTypedValue, true)
+    return ContextCompat.getColor(this, maskTypedValue.resourceId)
+}
+
+/**This extension streamlines access to read-only data from the ViewModel's state.*/
+val <STATE : Any, SIDE_EFFECT : Any> ContainerHost<STATE, SIDE_EFFECT>.currentState: STATE
+    get() = container.stateFlow.value
+
+/**This extension simplifies implementing item click listeners in RecyclerView, reducing boilerplate code.*/
+fun <T> LivelyAdapter<T>.setOnItemClickListener(listener: OnItemClickListener<T>) {
+    this.onItemClickListener = listener
+}
+
+/**This extension simplifies setting up long press listeners for RecyclerView items, reducing boilerplate code.*/
+fun <T> LivelyAdapter<T>.setOnItemLongPressListener(listener: OnItemLongPressListener<T>) {
+    this.onItemLongPressListener = listener
+}
+
+/**This extension simplifies the implementation of a double-tap listener for RecyclerView items, reducing boilerplate code.*/
+fun <T> LivelyAdapter<T>.setOnItemDoubleTapListener(listener: OnItemDoubleTapListener<T>) {
+    this.onItemDoubleTapListener = listener
 }

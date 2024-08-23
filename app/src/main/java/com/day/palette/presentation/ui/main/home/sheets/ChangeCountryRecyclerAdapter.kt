@@ -2,21 +2,28 @@ package com.day.palette.presentation.ui.main.home.sheets
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.day.palette.databinding.CardChangeCountryBinding
 import com.day.palette.domain.model.Country
 import com.day.palette.presentation.utils.AdaptiveRecyclerView
+import com.day.palette.presentation.utils.DP
+import com.day.palette.presentation.utils.LivelyAdapter
+import com.day.palette.presentation.utils.OnItemClickListener
+import com.day.palette.presentation.utils.OnItemDoubleTapListener
+import com.day.palette.presentation.utils.OnItemLongPressListener
+import com.day.palette.presentation.utils.RECYCLER_ITEM_PARENT
 import com.day.palette.presentation.utils.diffCallback
-import com.day.palette.presentation.utils.dp
 
 class ChangeCountryRecyclerAdapter(
     private val context: Context, private var allCountries: List<Country>
-) : RecyclerView.Adapter<ChangeCountryRecyclerAdapter.ChangeCountryRecyclerViewHolder>() {
+) : RecyclerView.Adapter<ChangeCountryRecyclerAdapter.ChangeCountryRecyclerViewHolder>(),
+    LivelyAdapter<Country> {
 
-    private var onClickListener: OnClickListener? = null
+    override var onItemClickListener: OnItemClickListener<Country>? = null
+    override var onItemLongPressListener: OnItemLongPressListener<Country>? = null
+    override var onItemDoubleTapListener: OnItemDoubleTapListener<Country>? = null
 
     class ChangeCountryRecyclerViewHolder(b: CardChangeCountryBinding) :
         RecyclerView.ViewHolder(b.root) {
@@ -44,7 +51,7 @@ class ChangeCountryRecyclerAdapter(
         h.cardChangeCountryRB.isChecked = country.isSelected
 
 
-        h.cardChangeCountryRB.setOnClickListener { view ->
+        h.cardChangeCountryRB.setOnClickListener { _ ->
             /*        val currentSelectedCountryIndex = allCountries.indexOfFirst { it.isSelected }
                     if (currentSelectedCountryIndex != -1) allCountries.find { it.isSelected }?.isSelected =
                         false
@@ -53,7 +60,7 @@ class ChangeCountryRecyclerAdapter(
 
                     if (currentSelectedCountryIndex != -1) notifyItemChanged(currentSelectedCountryIndex)*/
 
-            onClickListener?.onClick(position, country, view)
+            onItemClickListener?.invoke(position, country, RECYCLER_ITEM_PARENT)
         }
 
     }
@@ -74,18 +81,10 @@ class ChangeCountryRecyclerAdapter(
     }
 
     private fun calculateDesiredHeight(newItems: List<Country>, screenHeight: Int): Int {
-        val itemHeight = 48.dp
-        val contentHeight = (newItems.size * itemHeight) + 16.dp
+        val itemHeight = 48.DP
+        val contentHeight = (newItems.size * itemHeight) + 16.DP
 
         // Use contentHeight if it's less than screenHeight, otherwise match_parent
         return if (contentHeight < screenHeight) contentHeight else screenHeight
-    }
-
-    fun setOnClickListener(onClickListener: OnClickListener) {
-        this.onClickListener = onClickListener
-    }
-
-    interface OnClickListener {
-        fun onClick(position: Int, country: Country, view: View)
     }
 }

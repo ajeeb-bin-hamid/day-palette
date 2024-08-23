@@ -13,6 +13,8 @@ import com.day.palette.databinding.ActivityMainBinding
 import com.day.palette.presentation.ui.main.explore.ExploreFragment
 import com.day.palette.presentation.ui.main.home.HomeFragment
 import com.day.palette.presentation.ui.main.memories.MemoriesFragment
+import com.day.palette.presentation.utils.INSTANCE_BOTTOM_BAR_SELECTED_ITEM
+import com.day.palette.presentation.utils.INSTANCE_POPULATED
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.orbitmvi.orbit.viewmodel.observe
@@ -119,11 +121,5 @@ class MainActivity : AppCompatActivity() {
         outState.putBoolean(INSTANCE_POPULATED, true)
         outState.putInt(INSTANCE_BOTTOM_BAR_SELECTED_ITEM, selectedItemId)
         super.onSaveInstanceState(outState)
-    }
-
-    companion object {
-        //keys for handling savedInstanceState
-        const val INSTANCE_POPULATED = "instance_populated"
-        const val INSTANCE_BOTTOM_BAR_SELECTED_ITEM = "instance_bottom_bar_selected_item"
     }
 }

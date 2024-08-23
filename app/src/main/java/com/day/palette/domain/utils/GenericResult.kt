@@ -1,4 +1,4 @@
-package com.day.palette.domain
+package com.day.palette.domain.utils
 
 
 sealed class GenericResult<out D, out E : GenericError> {
