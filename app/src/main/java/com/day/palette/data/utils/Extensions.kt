@@ -1,7 +1,7 @@
 package com.day.palette.data.utils
 
-import com.day.palette.domain.Errors
-import com.day.palette.domain.GenericResult
+import com.day.palette.domain.utils.Errors
+import com.day.palette.domain.utils.GenericResult
 import retrofit2.Response
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_OK

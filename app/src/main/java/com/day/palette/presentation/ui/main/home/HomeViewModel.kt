@@ -4,7 +4,7 @@ import android.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.day.palette.domain.GenericResult
+import com.day.palette.domain.utils.GenericResult
 import com.day.palette.domain.model.SelectedCountryDetails
 import com.day.palette.domain.usecase.GetAllCountriesUseCase
 import com.day.palette.domain.usecase.GetCountryHolidaysUseCase
@@ -18,7 +18,6 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
-import java.util.ArrayList
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -56,9 +55,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
-            is GenericResult.Error -> {
-                //
-            }
+            is GenericResult.Error -> Unit
         }
     }
 
@@ -68,17 +65,9 @@ class HomeViewModel @Inject constructor(
      * Instead, use side effects to invoke these functions from the UI components.*/
     fun invoke(action: HomeIntent) = intent {
         when (action) {
-            is HomeIntent.GetCountryHolidays -> {
-                getCountryHolidays(state.selectedCountryCode)
-            }
-
-            is HomeIntent.GetAllCountries -> {
-                getAllCountries()
-            }
-
-            is HomeIntent.SetSelectedCountry -> {
-                setSelectedCountry(action.selectedCountryDetails)
-            }
+            is HomeIntent.GetCountryHolidays -> getCountryHolidays(state.selectedCountryCode)
+            is HomeIntent.GetAllCountries -> getAllCountries()
+            is HomeIntent.SetSelectedCountry -> setSelectedCountry(action.selectedCountryDetails)
         }
     }
 

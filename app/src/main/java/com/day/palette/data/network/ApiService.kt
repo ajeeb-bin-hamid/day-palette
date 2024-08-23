@@ -13,4 +13,7 @@ interface ApiService {
 
     @GET("AvailableCountries")
     suspend fun getAllCountries(): Response<List<Country>>
+
+    @GET("NextPublicHolidaysWorldwide")
+    suspend fun getWorldWideHolidays(): Response<ArrayList<Holiday>>
 }

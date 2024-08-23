@@ -1,7 +1,7 @@
 package com.day.palette.domain.usecase
 
-import com.day.palette.domain.Errors
-import com.day.palette.domain.GenericResult
+import com.day.palette.domain.utils.Errors
+import com.day.palette.domain.utils.GenericResult
 import com.day.palette.domain.model.Holiday
 import com.day.palette.domain.repository.RemoteRepository
 import javax.inject.Inject
