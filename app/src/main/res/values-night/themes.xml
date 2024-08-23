@@ -4,9 +4,10 @@
         <item name="colorPrimary">@color/buttercup_bliss</item>
         <item name="colorOnPrimary">@color/coal</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:colorBackground">@color/ink</item>
+        <item name="colorBackground">@color/ink</item>
         <item name="colorOnBackground">@color/white</item>
         <item name="colorDivider">@color/slate</item>
         <item name="colorShimmer">@color/concrete</item>
+        <item name="colorDivision">@color/charcoal</item>
     </style>
 </resources>

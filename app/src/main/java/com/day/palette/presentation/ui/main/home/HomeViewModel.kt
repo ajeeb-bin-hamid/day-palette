@@ -5,8 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.day.palette.domain.GenericResult
+import com.day.palette.domain.model.SelectedCountryDetails
+import com.day.palette.domain.usecase.GetAllCountriesUseCase
 import com.day.palette.domain.usecase.GetCountryHolidaysUseCase
 import com.day.palette.domain.usecase.GetSelectedCountryDetailsUseCase
+import com.day.palette.domain.usecase.SetSelectedCountryDetailsUseCase
 import com.day.palette.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,6 +18,7 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.util.ArrayList
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -22,24 +26,25 @@ import kotlin.random.Random
 class HomeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getSelectedCountryDetailsUseCase: GetSelectedCountryDetailsUseCase,
-    private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase
-) : ViewModel(), ContainerHost<HomeState, HomeIntent> {
-
-    private val selectedCountryDetails = getSelectedCountryDetailsUseCase.execute()
+    private val getCountryHolidaysUseCase: GetCountryHolidaysUseCase,
+    private val getAllCountriesUseCase: GetAllCountriesUseCase,
+    private val setSelectedCountryDetailsUseCase: SetSelectedCountryDetailsUseCase
+) : ViewModel(), ContainerHost<HomeState, HomeSideEffect> {
 
     private val initialState = HomeState(
         selectedCountryName = DEFAULT_COUNTRY_NAME,
         selectedCountryCode = DEFAULT_COUNTRY_CODE,
-        countryHolidays = emptyList(),
+        countryHolidays = ArrayList(),
+        allCountries = emptyList(),
         isLoading = false
     )
 
-    override val container = container<HomeState, HomeIntent>(initialState, savedStateHandle)
+    override val container = container<HomeState, HomeSideEffect>(initialState, savedStateHandle)
 
     /**This block evaluates the shared preference use case call.
      * If the call is successful, the state is updated with the retrieved data.*/
     init {
-        when (selectedCountryDetails) {
+        when (val selectedCountryDetails = getSelectedCountryDetailsUseCase.execute()) {
             is GenericResult.Success -> {
                 intent {
                     reduce {
@@ -57,33 +62,81 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /**Public function exposed to UI components such as Activities and Fragments,
-     * allowing them to invoke operations on this ViewModel.*/
+    /**Public function exposed to UI components such as Activities, Fragments, and Bottom Sheets,
+     * allowing them to perform operations on this ViewModel.
+     * Do not call these functions or any functions declared within them directly from the ViewModel.
+     * Instead, use side effects to invoke these functions from the UI components.*/
     fun invoke(action: HomeIntent) = intent {
         when (action) {
-            HomeIntent.GetCountryHolidays -> {
+            is HomeIntent.GetCountryHolidays -> {
                 getCountryHolidays(state.selectedCountryCode)
             }
 
-            else -> {
-                //
+            is HomeIntent.GetAllCountries -> {
+                getAllCountries()
+            }
+
+            is HomeIntent.SetSelectedCountry -> {
+                setSelectedCountry(action.selectedCountryDetails)
             }
         }
     }
 
     private fun getCountryHolidays(countryCode: String) {
         viewModelScope.launch {
-            when (val countryHolidays = getCountryHolidaysUseCase.execute(countryCode)) {
+            when (val countryHolidaysCall = getCountryHolidaysUseCase.execute(countryCode)) {
                 is GenericResult.Success -> {
-                    countryHolidays.data.forEach { item -> item.bgColor = getRandomDarkColor() }
-                    intent { reduce { state.copy(countryHolidays = countryHolidays.data) } }
+                    countryHolidaysCall.data.forEach { item -> item.bgColor = getRandomDarkColor() }
+                    intent { reduce { state.copy(countryHolidays = countryHolidaysCall.data) } }
                 }
 
                 is GenericResult.Error -> {
-                    intent { postSideEffect(HomeIntent.ShowSnack(countryHolidays.error.asUiText())) }
+                    intent { postSideEffect(HomeSideEffect.ShowSnack(countryHolidaysCall.error.asUiText())) }
                 }
             }
 
+        }
+    }
+
+    private fun getAllCountries() {
+        viewModelScope.launch {
+            when (val allCountriesCall = getAllCountriesUseCase.execute()) {
+                is GenericResult.Success -> {
+                    allCountriesCall.data.find { it.code == container.stateFlow.value.selectedCountryCode }?.isSelected =
+                        true
+                    intent { reduce { state.copy(allCountries = allCountriesCall.data) } }
+                }
+
+                is GenericResult.Error -> {
+                    intent { postSideEffect(HomeSideEffect.ShowToast(allCountriesCall.error.asUiText())) }
+                }
+            }
+        }
+    }
+
+    private fun setSelectedCountry(selectedCountryDetails: SelectedCountryDetails) {
+        when (val setSelectedCountryCall =
+            setSelectedCountryDetailsUseCase.execute(selectedCountryDetails)) {
+            is GenericResult.Success -> {
+                val allCountries = container.stateFlow.value.allCountries
+                allCountries.find { it.isSelected }?.isSelected = false
+                allCountries.find { it.code == selectedCountryDetails.selectedCountryCode }?.isSelected =
+                    true
+                intent {
+                    reduce {
+                        state.copy(
+                            selectedCountryName = selectedCountryDetails.selectedCountryName,
+                            selectedCountryCode = selectedCountryDetails.selectedCountryCode,
+                            allCountries = allCountries
+                        )
+                    }
+                    postSideEffect(HomeSideEffect.GetCountryHolidays)
+                }
+            }
+
+            is GenericResult.Error -> {
+                intent { postSideEffect(HomeSideEffect.ShowSnack(setSelectedCountryCall.error.asUiText())) }
+            }
         }
     }
 

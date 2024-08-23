@@ -12,7 +12,6 @@ import com.day.palette.R
 import com.day.palette.databinding.ActivityMainBinding
 import com.day.palette.presentation.ui.main.explore.ExploreFragment
 import com.day.palette.presentation.ui.main.home.HomeFragment
-import com.day.palette.presentation.ui.main.home.HomeFragment.Companion
 import com.day.palette.presentation.ui.main.memories.MemoriesFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,16 +29,10 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(b.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
-        }
-
         vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
 
         //Perform all the UI setup here
+        setUpInsets()
         setUpBottomBar()
 
         //Check if UI component is recreating itself
@@ -58,20 +51,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**Observe side effects using Orbit StateFlow*/
-    private fun observeIntent(intent: MainIntent) {
+    private fun observeIntent(intent: MainSideEffect) {
         when (intent) {
-            is MainIntent.ShowToast -> {
+            is MainSideEffect.ShowToast -> {
                 Toast.makeText(this@MainActivity, intent.message.asString(this), Toast.LENGTH_SHORT)
                     .show()
             }
 
-            is MainIntent.ShowSnack -> {
+            is MainSideEffect.ShowSnack -> {
                 Snackbar.make(b.root, intent.message.asString(this), Snackbar.LENGTH_SHORT).show()
             }
+        }
+    }
 
-            else -> {
-                //
-            }
+    private fun setUpInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
         }
     }
 

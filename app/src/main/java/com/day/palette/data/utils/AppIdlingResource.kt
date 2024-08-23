@@ -6,7 +6,7 @@ class AppIdlingResource : IdlingResource {
 
     @Volatile
     private var callback: IdlingResource.ResourceCallback? = null
-    private val backgroundOperations = mutableListOf<() -> Unit>()
+    private val backgroundOperations = mutableListOf<() -> Any>()
 
     override fun getName(): String = "AppIdlingResource"
 
@@ -16,12 +16,12 @@ class AppIdlingResource : IdlingResource {
         this.callback = callback
     }
 
-    fun registerBackgroundOperation(operation: () -> Unit) {
+    fun registerBackgroundOperation(operation: () -> Any) {
         backgroundOperations.add(operation)
         checkIdleState()
     }
 
-    fun unregisterBackgroundOperation(operation: () -> Unit) {
+    fun unregisterBackgroundOperation(operation: () -> Any) {
         backgroundOperations.remove(operation)
         checkIdleState()
     }

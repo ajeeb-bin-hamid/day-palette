@@ -19,4 +19,15 @@ class UserPrefsRepositoryImpl @Inject constructor(private val sharedPrefsHelper:
         )
         return GenericResult.Error(Errors.Prefs.NO_SUCH_DATA)
     }
+
+    override fun setSelectedCountryDetails(selectedCountryDetails: SelectedCountryDetails): GenericResult<Unit, Errors.Prefs> {
+        try {
+            sharedPrefsHelper.selectedCountryCode = selectedCountryDetails.selectedCountryCode
+            sharedPrefsHelper.selectedCountryName = selectedCountryDetails.selectedCountryName
+            return GenericResult.Success(Unit)
+        } catch (e: Exception) {
+            return GenericResult.Error(Errors.Prefs.UNKNOWN)
+        }
+    }
+
 }

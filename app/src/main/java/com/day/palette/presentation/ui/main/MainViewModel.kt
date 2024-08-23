@@ -11,12 +11,15 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
-) : ViewModel(), ContainerHost<MainState, MainIntent> {
+) : ViewModel(), ContainerHost<MainState, MainSideEffect> {
 
-    override val container = container<MainState, MainIntent>(MainState(), savedStateHandle)
+    override val container = container<MainState, MainSideEffect>(MainState(), savedStateHandle)
 
 
-    /**This function is used by UI component to invoke any actions on the ViewModel*/
+    /**Public function exposed to UI components such as Activities, Fragments, and Bottom Sheets,
+     * allowing them to perform operations on this ViewModel.
+     * Do not call these functions or any functions declared within them directly from the ViewModel.
+     * Instead, use side effects to invoke these functions from the UI components.*/
     fun invoke(action: MainIntent) = intent {
         //
     }

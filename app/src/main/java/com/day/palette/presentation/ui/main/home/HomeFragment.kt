@@ -13,14 +13,16 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.day.palette.R
 import com.day.palette.databinding.FragmentHomeBinding
 import com.day.palette.domain.model.Holiday
+import com.day.palette.presentation.ui.main.home.sheets.ChangeCountrySheet
 import com.day.palette.presentation.utils.TypefaceSpan
+import com.day.palette.presentation.utils.dp
+import com.day.palette.presentation.utils.itemDecoration
 import com.day.palette.presentation.utils.parcelable
-import com.day.palette.presentation.utils.toPx
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.snackbar.Snackbar
@@ -32,7 +34,7 @@ import org.orbitmvi.orbit.viewmodel.observe
 class HomeFragment : Fragment() {
 
     private lateinit var b: FragmentHomeBinding
-    private val vm: HomeViewModel by viewModels()
+    private val vm: HomeViewModel by activityViewModels()
 
     private lateinit var recyclerAdapter: HomeRecyclerAdapter
     private lateinit var skeleton: Skeleton
@@ -43,20 +45,23 @@ class HomeFragment : Fragment() {
 
         //Initialize View binding & setup Viewmodel observers
         b = FragmentHomeBinding.inflate(inflater, container, false)
-        vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
+        vm.observe(this, state = ::observeState, sideEffect = ::observeSideEffect)
 
         //Perform all the UI setup here
         setUpRecyclerView()
         setUpSkeleton()
+        setUpChangeCountryButton()
 
         //Check if UI component is recreating itself
         if (savedInstanceState != null) {
             val recyclerState = savedInstanceState.parcelable<Parcelable>(INSTANCE_RECYCLER_STATE)
             b.homeFragmentRV.layoutManager?.onRestoreInstanceState(recyclerState)
         } else {
-            //API call to fetch selected country holidays
-            vm.invoke(HomeIntent.GetCountryHolidays)
-            skeleton.showSkeleton()
+            //Fetch all country holidays only if the data is not in the ViewModel
+            if (vm.container.stateFlow.value.countryHolidays.isEmpty()) {
+                vm.invoke(HomeIntent.GetCountryHolidays)
+                skeleton.showSkeleton()
+            }
         }
 
         return b.root
@@ -70,23 +75,24 @@ class HomeFragment : Fragment() {
     }
 
     /**Observe side effects using Orbit StateFlow*/
-    private fun observeIntent(intent: HomeIntent) {
+    private fun observeSideEffect(intent: HomeSideEffect) {
         when (intent) {
-            is HomeIntent.ShowToast -> {
+            is HomeSideEffect.ShowToast -> {
                 context?.let {
                     Toast.makeText(it, intent.message.asString(it), Toast.LENGTH_SHORT).show()
                 }
-
             }
 
-            is HomeIntent.ShowSnack -> {
+            is HomeSideEffect.ShowSnack -> {
                 context?.let {
                     Snackbar.make(b.root, intent.message.asString(it), Snackbar.LENGTH_SHORT).show()
                 }
             }
 
-            else -> {
-                //
+            is HomeSideEffect.GetCountryHolidays -> {
+                //API call to fetch selected country holidays
+                vm.invoke(HomeIntent.GetCountryHolidays)
+                skeleton.showSkeleton()
             }
         }
     }
@@ -97,7 +103,6 @@ class HomeFragment : Fragment() {
                 override fun onClick(position: Int, holiday: Holiday, view: View) {
                     //
                 }
-
             })
         }
 
@@ -105,7 +110,13 @@ class HomeFragment : Fragment() {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = recyclerAdapter
             isNestedScrollingEnabled = false
-            addItemDecoration(HomeRecyclerDecoration(requireContext().toPx(16)))
+
+            itemDecoration(margin = 16.dp) { outRect, position, margin ->
+                if (position == 0 || position == 1) outRect.top = margin
+                if (position % 2 == 0) outRect.right = margin / 2
+                if (position % 2 == 1) outRect.left = margin / 2
+                outRect.bottom = margin
+            }
         }
     }
 
@@ -119,10 +130,20 @@ class HomeFragment : Fragment() {
         val colorShimmer = ContextCompat.getColor(requireContext(), shimmerTypedValue.resourceId)
 
         skeleton = b.homeFragmentRV.applySkeleton(R.layout.card_holiday_compact, 5).apply {
-            maskCornerRadius = requireContext().toPx(24).toFloat()
+            maskCornerRadius = 16.dp.toFloat()
             shimmerDurationInMillis = 750
             maskColor = colorMask
             shimmerColor = colorShimmer
+        }
+    }
+
+    private fun setUpChangeCountryButton() {
+        b.homeFragmentChangeCountryButton.setOnClickListener {
+            activity?.let {
+                ChangeCountrySheet().show(
+                    it.supportFragmentManager, ChangeCountrySheet.TAG
+                )
+            }
         }
     }
 
@@ -150,10 +171,10 @@ class HomeFragment : Fragment() {
 
     }
 
-    private fun modifyRecyclerView(countryHolidays: List<Holiday>) {
-        if (countryHolidays.size > recyclerAdapter.itemCount) {
-            recyclerAdapter.appendItems(countryHolidays)
-            skeleton.showOriginal()
+    private fun modifyRecyclerView(countryHolidays: ArrayList<Holiday>) {
+        if (countryHolidays.isNotEmpty()) {
+            recyclerAdapter.updateItems(countryHolidays)
+            if (skeleton.isSkeleton()) skeleton.showOriginal()
         }
     }
 

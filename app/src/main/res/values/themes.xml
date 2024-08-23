@@ -3,12 +3,14 @@
     <style name="Base.Theme.DayPalette" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/buttercup_bliss</item>
+        <item name="colorSecondary">@color/blush</item>
         <item name="colorOnPrimary">@color/coal</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:colorBackground">@color/white</item>
+        <item name="colorBackground">@color/white</item>
         <item name="colorOnBackground">@color/coal</item>
         <item name="colorDivider">@color/pearl</item>
         <item name="colorShimmer">@color/blush</item>
+        <item name="colorDivision">@color/valencia</item>
     </style>
 
     <style name="Theme.DayPalette" parent="Base.Theme.DayPalette" />
@@ -183,4 +185,12 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <!--    Style to customize Navigation bar color for Bottom sheets-->
+    <style name="Sheet.ColorSystem" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">?attr/colorBackground</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
 </resources>
