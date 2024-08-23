@@ -58,7 +58,7 @@ class HomeRecyclerAdapter(
             oldList = countryHolidays,
             newList = newItems,
             areItemsTheSame = { oldItem, newItem ->
-                "${oldItem.countryCode}${oldItem.name}" == "${newItem.countryCode}${newItem.name}"
+                "${oldItem.countryCode}${oldItem.bgColor}" == "${newItem.countryCode}${newItem.bgColor}"
             })
 
         val diffResult = DiffUtil.calculateDiff(diffCallback)

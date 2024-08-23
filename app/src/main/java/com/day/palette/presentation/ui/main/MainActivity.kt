@@ -29,16 +29,10 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(b.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
-        }
-
         vm.observe(this, state = ::observeState, sideEffect = ::observeIntent)
 
         //Perform all the UI setup here
+        setUpInsets()
         setUpBottomBar()
 
         //Check if UI component is recreating itself
@@ -67,6 +61,14 @@ class MainActivity : AppCompatActivity() {
             is MainSideEffect.ShowSnack -> {
                 Snackbar.make(b.root, intent.message.asString(this), Snackbar.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun setUpInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
         }
     }
 

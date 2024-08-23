@@ -21,6 +21,7 @@ inline val Int.dp: Int
         TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
     ).toInt()
 
+
 /**This extension leverages the latest methods for handling Parcelable data on newer Android versions
  * while also providing backward compatibility for older versions using deprecated methods.*/
 inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
