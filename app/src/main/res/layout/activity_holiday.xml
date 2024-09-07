@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/holidayActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorBackground"
+    tools:context=".presentation.ui.holiday.HolidayActivity">
+
+    <ImageButton
+        android:id="@+id/holidayActivityCloseIB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@color/transparent"
+        android:contentDescription="@string/desc_close_button"
+        android:padding="16dp"
+        android:src="@drawable/ico_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/holidayActivityDayTV"
+        style="@style/Text.1.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="@dimen/_36sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holidayActivityCloseIB"
+        tools:text="02" />
+
+    <TextView
+        android:id="@+id/holidayActivityTypeTV"
+        style="@style/Text.5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_chip_holiday_type"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:text="@string/regional"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/holidayActivityDayTV" />
+
+    <TextView
+        android:id="@+id/holidayActivityMonthTV"
+        style="@style/Text.4.SemiBold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="@dimen/_11sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holidayActivityDayTV"
+        tools:text="September, 2024" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/holidayActivityDivider"
+        android:layout_width="48dp"
+        android:layout_height="2dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="?attr/colorOnSecondary"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holidayActivityMonthTV" />
+
+    <TextView
+        android:id="@+id/holidayActivityImportanceTV"
+        style="@style/Text.2.SemiBold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="@dimen/_22sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holidayActivityDivider"
+        tools:text="Labour Day" />
+
+    <TextView
+        android:id="@+id/holidayActivityDescriptionTV"
+        style="@style/Text.4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="@dimen/_11sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holidayActivityImportanceTV"
+        tools:text="On 2024-09-02, the Labour Day holiday, also known as Labor Day, is celebrated in US. This is a Public holiday and is observed globally." />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holidayActivityDescriptionTV">
+
+        <ImageButton
+            android:id="@+id/holidayActivityShareIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_round"
+            android:contentDescription="@string/desc_share_button"
+            android:padding="22dp"
+            android:src="@drawable/ico_share" />
+
+        <ImageButton
+            android:id="@+id/holidayActivityCameraIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:background="@drawable/bg_button_round"
+            android:contentDescription="@string/desc_camera_button"
+            android:padding="22dp"
+            android:src="@drawable/ico_camera" />
+
+        <ImageButton
+            android:id="@+id/holidayActivityHelpIB"
+            style="@style/Text.2.SemiBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_round"
+            android:contentDescription="@string/desc_help_button"
+            android:padding="22dp"
+            android:src="@drawable/ico_help" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

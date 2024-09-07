@@ -18,8 +18,21 @@
 
     <!--    titles-->
     <string name="next_week_s_holidays_worldwide">Next Week\'s Holidays Worldwide</string>
+
+    <!--    Content descriptions-->
+    <string name="desc_close_button">Close button</string>
+    <string name="desc_share_button">Share button</string>
+    <string name="desc_camera_button">Camera button</string>
+    <string name="desc_help_button">Help button</string>
+
     <string name="global">Global</string>
     <string name="regional">Regional</string>
-
+    <string name="holiday_description">
+        On %1$s, the %2$s holiday, also known as %3$s, is celebrated in %4$s. This is %5$s Public holiday and is observed %6$s.
+    </string>
+    <string name="a">a</string>
+    <string name="not_a">not a</string>
+    <string name="globally">globally</string>
+    <string name="locally">locally</string>
 
 </resources>

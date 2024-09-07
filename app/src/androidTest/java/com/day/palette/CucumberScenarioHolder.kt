@@ -5,8 +5,8 @@ import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.platform.app.InstrumentationRegistry
-import com.day.palette.data.utils.AppIdlingResource
-import com.day.palette.presentation.ui.main.MainActivity
+import com.day.palette.common.data.utils.AppIdlingResource
+import com.day.palette.home.presentation.ui.main.MainActivity
 import io.cucumber.java.After
 import io.cucumber.java.Before
 import javax.inject.Inject

@@ -7,7 +7,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.day.palette.R
-import com.day.palette.presentation.ui.main.home.HomeRecyclerAdapter
+import com.day.palette.home.presentation.ui.main.home.HomeRecyclerAdapter
 import com.day.palette.utils.validateText
 import com.day.palette.utils.validationGroup
 import io.cucumber.java.en.And
